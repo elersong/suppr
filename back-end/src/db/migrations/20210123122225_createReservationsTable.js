@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.string("mobile");
     table.date("date");
     table.time("time");
+    table.integer("size");
     table.timestamps(true, true);
   });
 };
