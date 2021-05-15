@@ -24,9 +24,7 @@ const hasAllValidProperties = require("../errors/hasProperties")("first_name", "
 
 // GET /reservations
 async function list(req, res) {
-  res.json({
-    data: "list function",
-  });
+  res.json({ data: await service.listAll() });
 }
 
 // POST /reservations

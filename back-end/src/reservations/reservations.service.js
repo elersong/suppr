@@ -23,8 +23,12 @@ function read(review_id) {
   return knex("reviews").select("*").where({ review_id });
 }
 
-function listAll() {
+function listDate() {
   return knex("reviews as r").select("r.*");
+}
+
+function listAll() {
+  return knex("reservations as r").select("r.*");
 }
 
 function create(newData) {
@@ -35,5 +39,10 @@ function create(newData) {
 }
 
 module.exports = {
-  update, destroy, read, listAll, create
-}
+  update,
+  destroy,
+  read,
+  listAll,
+  create,
+  listDate,
+};
