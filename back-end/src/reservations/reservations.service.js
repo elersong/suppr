@@ -23,10 +23,10 @@ function read(review_id) {
   return knex("reviews").select("*").where({ review_id });
 }
 
-function listByDate(date_str) {
-  return knex("reservations as r")
-  .select("r.*")
-  .where({ date: date_str });
+function listByDate(reservation_date) {
+  return knex("reservations")
+  .select("*")
+  .where({ reservation_date });
 }
 
 function listAll() {

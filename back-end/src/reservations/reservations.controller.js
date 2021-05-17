@@ -9,15 +9,8 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 // Validation fxns ==========================================================
 
-//  table.increments("reservation_id").primary();
-//  table.string("first_name");
-//  table.string("last_name");
-//  table.string("mobile");
-//  table.date("date");
-//  table.time("time");
-//  table.integer("size");
-//  table.timestamps(true, true);
-const hasAllValidProperties = require("../errors/hasProperties")("first_name", "last_name", "mobile", "date", "time", "size");
+
+const hasAllValidProperties = require("../errors/hasProperties")("first_name", "last_name", "mobile_number", "reservation_date", "reservation_time", "people");
 
 
 // Middleware fxns ==========================================================
@@ -25,11 +18,12 @@ const hasAllValidProperties = require("../errors/hasProperties")("first_name", "
 // GET /reservations
 async function list(req, res) {
   let reservations;
-  if (req.query) {
-    reservations = await service.listByDate(req.query.date)
+  if (req.query.reservation_date) {
+    reservations = await service.listByDate(req.query.reservation_date)
   } else {
     reservations = await service.listAll();
   }
+  console.log(reservations)
   res.json({ data: reservations });
 }
 
