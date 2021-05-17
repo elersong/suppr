@@ -55,9 +55,8 @@ async function list(req, res) {
   } else {
     reservations = await service.listAll();
   }
-
+  
   if (reservations.length > 1) {
-    console.log("RESERVATIONS_FOR_SORT ", reservations)
     reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
   }
 
