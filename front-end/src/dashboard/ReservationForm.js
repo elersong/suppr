@@ -16,7 +16,8 @@ function ReservationForm( { setActiveDate } ) {
   const [apiError, setApiError] = useState();
   const history = useHistory();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const ABORT = new AbortController();
     const runCreateFunction = async () => {
       try {
@@ -31,7 +32,7 @@ function ReservationForm( { setActiveDate } ) {
         }
       }
     };
-    runCreateFunction();
+    await runCreateFunction();
     if (!apiError) {
       history.push(`/dashboard`);
     }
