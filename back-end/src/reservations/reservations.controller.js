@@ -50,11 +50,14 @@ const hasValidReservationData = (req, res, next) => {
 // GET /reservations
 async function list(req, res) {
   let reservations;
-  if (req.query.reservation_date) {
-    reservations = await service.listByDate(req.query.reservation_date);
+  if (req.query.date) {
+    reservations = await service.listByDate(req.query.date);
   } else {
     reservations = await service.listAll();
   }
+
+  reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+  
   res.json({ data: reservations });
 }
 
