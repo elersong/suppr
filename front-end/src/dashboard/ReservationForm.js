@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { today } from "../utils/date-time";
 import { Link, useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
+import ErrorAlert from "../layout/ErrorAlert"
 
 function ReservationForm() {
   const startingValues = {
@@ -13,6 +14,7 @@ function ReservationForm() {
     time: "",
   };
   const [formData, setFormData] = useState(startingValues);
+  const [apiError, setApiError] = useState();
   const history = useHistory();
 
   const handleSubmit = (e) => {
@@ -25,13 +27,14 @@ function ReservationForm() {
         if (err.name === "AbortError") {
           console.log(err);
         } else {
-          throw err;
+          await setApiError(err);
         }
       }
     };
     runCreateFunction();
-    history.push(`/dashboard`);
-    //triggerRerender(true);
+    if (!apiError) {
+      history.push(`/dashboard`);
+    }
 
     return () => {
       ABORT.abort();
@@ -76,6 +79,7 @@ function ReservationForm() {
   };
 
   return (
+    <div>
     <form onSubmit={handleSubmit}>
       <label htmlFor="first_name">First Name: </label>
       <input
@@ -139,10 +143,11 @@ function ReservationForm() {
       <br></br>
 
       <button type="submit">Submit</button>
-      <Link to={`/dashboard`}>
+      <Link to={`/dashboard?date=${formData.date}`}>
         <button className="btn btn-secondary">Cancel</button>
       </Link>
     </form>
+    </div>
   );
 }
 
