@@ -21,6 +21,9 @@ function Dashboard({ date, setActiveDate }) {
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
+      .then(response => {
+        return response.sort((a,b) => a.time.localeCompare(b.time))
+      })
       .then(setReservations)
       .catch(setReservationsError);
     return () => abortController.abort();
@@ -67,6 +70,7 @@ function Dashboard({ date, setActiveDate }) {
         reservations.map((reservation, idx) => {
           return <ReservationDisplay reservation={reservation} key={idx} />;
         })}
+      {reservations.length > 0 && console.log(reservations)}
     </main>
   );
 }
