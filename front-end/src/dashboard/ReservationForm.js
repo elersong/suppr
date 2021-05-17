@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { today } from "../utils/date-time";
 import { Link, useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert"
 
-function ReservationForm() {
+function ReservationForm( { setActiveDate } ) {
   const startingValues = {
     first_name: "",
     last_name: "",
@@ -22,6 +21,7 @@ function ReservationForm() {
     const runCreateFunction = async () => {
       try {
         const response = await createReservation(formData, ABORT.signal);
+        setActiveDate(formData.date)
         console.log("Reservation Created", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -143,7 +143,7 @@ function ReservationForm() {
       <br></br>
 
       <button type="submit">Submit</button>
-      <Link to={`/dashboard?date=${formData.date}`}>
+      <Link to={`/dashboard`}>
         <button className="btn btn-secondary">Cancel</button>
       </Link>
     </form>

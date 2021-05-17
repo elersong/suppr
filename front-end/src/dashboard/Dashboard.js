@@ -13,6 +13,7 @@ function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
 
+  // eslint-disable-next-line
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
@@ -28,11 +29,14 @@ function Dashboard({ date }) {
     <main>
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date</h4>
+        <h4 className="mb-0">Reservations for date: {date}</h4>
       </div>
+      {reservations.length === 0 &&
+        <ErrorAlert error={{message: "No reservations found for this date"}} />
+      }
       <ErrorAlert error={reservationsError} />
-      {reservations.map((reservation, idx) => {
-        return <ReservationDisplay reservation={reservation} key={idx}/>;
+      {reservations.length > 0 && reservations.map((reservation, idx) => {
+        return <ReservationDisplay reservation={reservation} key={idx} />;
       })}
     </main>
   );

@@ -24,7 +24,13 @@ const hasAllValidProperties = require("../errors/hasProperties")("first_name", "
 
 // GET /reservations
 async function list(req, res) {
-  res.json({ data: await service.listAll() });
+  let reservations;
+  if (req.query) {
+    reservations = await service.listByDate(req.query.date)
+  } else {
+    reservations = await service.listAll();
+  }
+  res.json({ data: reservations });
 }
 
 // POST /reservations
