@@ -32,7 +32,7 @@ headers.append("Content-Type", "application/json");
 async function fetchJson(url, options, onCancel) {
   try {
     const response = await fetch(url, options);
-    console.log("API.JS ", response.status)
+    console.log("API.JS ", response.status);
     if (response.status === 204) {
       return null;
     }
@@ -67,3 +67,25 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
+/**
+ * Creates a new reservation, sending a POST request to /reservations/new
+ *
+ * @param reservationInfo
+ *  an object, describing the reservation to create, which must have proper properties
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to the new reservation, which will have a `reservation_id` property.
+ */
+export async function createReservation(reservationInfo, signal) {
+  const url = `${API_BASE_URL}/reservations/new`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify(reservationInfo),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+

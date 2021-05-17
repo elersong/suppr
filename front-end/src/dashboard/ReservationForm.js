@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { today } from "../utils/date-time";
+import { Link, useHistory } from "react-router-dom";
+import { createReservation } from "../utils/api";
 
 function ReservationForm() {
   const startingValues = {
@@ -9,13 +11,31 @@ function ReservationForm() {
     size: 1,
     date: "",
     time: "",
-  }
+  };
   const [formData, setFormData] = useState(startingValues);
+  const history = useHistory();
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    setFormData(startingValues);
+    const ABORT = new AbortController();
+    const runCreateFunction = async () => {
+      try {
+        const response = await createReservation(formData, ABORT.signal);
+        console.log("Reservation Created", response);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log(err);
+        } else {
+          throw err;
+        }
+      }
+    };
+    runCreateFunction();
+    history.push(`/dashboard`);
+    //triggerRerender(true);
+
+    return () => {
+      ABORT.abort();
+    };
   };
 
   const handleChange = (e) => {
@@ -48,7 +68,7 @@ function ReservationForm() {
         newState = { ...formData, time: e.target.value };
         setFormData(newState);
         break;
-      
+
       default:
         // just to quiet the linter
         break;
@@ -57,7 +77,7 @@ function ReservationForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="first_name">First Name:  </label>
+      <label htmlFor="first_name">First Name: </label>
       <input
         type="text"
         name="first_name"
@@ -66,7 +86,7 @@ function ReservationForm() {
         required
       ></input>
       <br></br>
-      <label htmlFor="last_name">Last Name:  </label>
+      <label htmlFor="last_name">Last Name: </label>
       <input
         type="text"
         name="last_name"
@@ -119,6 +139,9 @@ function ReservationForm() {
       <br></br>
 
       <button type="submit">Submit</button>
+      <Link to={`/dashboard`}>
+        <button className="btn btn-secondary">Cancel</button>
+      </Link>
     </form>
   );
 }
