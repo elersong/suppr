@@ -7,10 +7,10 @@ function ReservationForm( { setActiveDate } ) {
   const startingValues = {
     first_name: "",
     last_name: "",
-    mobile: "",
-    size: 1,
-    date: "",
-    time: "",
+    mobile_number: "",
+    people: 1,
+    reservation_date: "",
+    reservation_time: "",
   };
   const [formData, setFormData] = useState(startingValues);
   const [apiError, setApiError] = useState();
@@ -21,7 +21,7 @@ function ReservationForm( { setActiveDate } ) {
     const runCreateFunction = async () => {
       try {
         const response = await createReservation(formData, ABORT.signal);
-        setActiveDate(formData.date)
+        setActiveDate(formData.reservation_date)
         console.log("Reservation Created", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -55,20 +55,20 @@ function ReservationForm( { setActiveDate } ) {
         newState = { ...formData, last_name: e.target.value };
         setFormData(newState);
         break;
-      case "mobile":
-        newState = { ...formData, mobile: e.target.value };
+      case "mobile_number":
+        newState = { ...formData, mobile_number: e.target.value };
         setFormData(newState);
         break;
-      case "size":
-        newState = { ...formData, size: +e.target.value };
+      case "people":
+        newState = { ...formData, people: +e.target.value };
         setFormData(newState);
         break;
-      case "date":
-        newState = { ...formData, date: e.target.value };
+      case "reservation_date":
+        newState = { ...formData, reservation_date: e.target.value };
         setFormData(newState);
         break;
-      case "time":
-        newState = { ...formData, time: e.target.value };
+      case "reservation_time":
+        newState = { ...formData, reservation_time: e.target.value };
         setFormData(newState);
         break;
 
@@ -100,43 +100,43 @@ function ReservationForm( { setActiveDate } ) {
       ></input>
       <br></br>
 
-      <label htmlFor="mobile">Phone: </label>
+      <label htmlFor="mobile_number">Phone: </label>
       <input
         type="tel"
-        name="mobile"
-        value={formData.mobile}
+        name="mobile_number"
+        value={formData.mobile_number}
         onChange={handleChange}
         required
       ></input>
       <br></br>
 
-      <label htmlFor="size">Party Size: </label>
+      <label htmlFor="people">Party Size: </label>
       <input
         type="number"
-        name="size"
+        name="people"
         min="1"
-        value={formData.size}
+        value={formData.people}
         onChange={handleChange}
         required
       ></input>
       <br></br>
 
-      <label htmlFor="date">Date: </label>
+      <label htmlFor="reservation_date">Date: </label>
       <input
         type="date"
-        name="date"
+        name="reservation_date"
         min={today()}
-        value={formData.date}
+        value={formData.reservation_date}
         onChange={handleChange}
         required
       ></input>
       <br></br>
 
-      <label htmlFor="time">Time: </label>
+      <label htmlFor="reservation_time">Time: </label>
       <input
         type="time"
-        name="time"
-        value={formData.time}
+        name="reservation_time"
+        value={formData.reservation_time}
         onChange={handleChange}
         required
       ></input>

@@ -8,14 +8,14 @@ import React from "react";
  */
 
 function ReservationDisplay({ reservation }) {  
-  const {reservation_id, first_name, last_name, mobile, date, time, size} = reservation;
+  const {reservation_id, first_name, last_name, mobile_number, reservation_date, reservation_time, people} = reservation;
   return (
     <div className="card">
       <div className="card-body">
         <h5>{`${reservation_id}. ${first_name} ${last_name}`}</h5>
-        <h6>{`phone: ${mobile}`}</h6>
-        <h6>{`date: ${date} @ ${time}`}</h6>
-        <h6>{`party size: ${size}`}</h6>
+        <h6>{`phone: ${mobile_number}`}</h6>
+        <h6>{`date: ${reservation_date} @ ${reservation_time}`}</h6>
+        <h6>{`party size: ${people}`}</h6>
       </div>
     </div>
   );

@@ -70,7 +70,6 @@ function Dashboard({ date, setActiveDate }) {
         reservations.map((reservation, idx) => {
           return <ReservationDisplay reservation={reservation} key={idx} />;
         })}
-      {reservations.length > 0 && console.log(reservations)}
     </main>
   );
 }

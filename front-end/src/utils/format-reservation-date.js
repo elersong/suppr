@@ -1,7 +1,7 @@
 import { formatAsDate } from "./date-time";
 
 function formatDate(reservation) {
-  reservation.date = formatAsDate(reservation.date);
+  reservation.reservation_date = formatAsDate(reservation.reservation_date);
   return reservation;
 }
 
