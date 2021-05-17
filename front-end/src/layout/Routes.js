@@ -28,7 +28,7 @@ function Routes() {
         <Redirect to={"/dashboard"} />
       </Route>
       <Route path="/dashboard">
-        <Dashboard date={activeDate} />
+        <Dashboard date={activeDate} setActiveDate={setActiveDate}/>
       </Route>
       <Route>
         <NotFound />
