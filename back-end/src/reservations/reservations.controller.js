@@ -56,8 +56,11 @@ async function list(req, res) {
     reservations = await service.listAll();
   }
 
-  reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
-  
+  if (reservations.length > 1) {
+    console.log("RESERVATIONS_FOR_SORT ", reservations)
+    reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+  }
+
   res.json({ data: reservations });
 }
 
