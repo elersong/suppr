@@ -28,19 +28,26 @@ const hasValidReservationData = (req, res, next) => {
     people,
   } = req.body.data;
 
+  let message;
+
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
   const timeFormat = /\d\d:\d\d/;
 
-  const dateIsValid = reservation_date.match(dateFormat)?.length > 0;
+  const dateFormatIsValid = reservation_date.match(dateFormat)?.length > 0;
   const timeIsValid = reservation_time.match(timeFormat)?.length > 0;
   const peopleIsValid = typeof people === 'number'
 
-  if (dateIsValid && timeIsValid && peopleIsValid) {
+  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(reservation_date) >= Date.now())
+  if (!dateIsValid) {
+    message = "Date must be any future non-Tuesday."
+  }
+
+  if (dateFormatIsValid && dateIsValid && timeIsValid && peopleIsValid) {
     next();
   } else {
     next({
       status: 400,
-      message: "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}"
+      message: message || "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}"
     });
   }
 };
