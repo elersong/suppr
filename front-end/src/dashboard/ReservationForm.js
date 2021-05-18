@@ -70,11 +70,11 @@ function ReservationForm( { setActiveDate } ) {
       case "reservation_date":
         if (new Date(e.target.value).getDay() === 1) {
           setFormError({message: "Restaurant closed on Tuesdays. Select another day."})
-          newState = { ...formData, reservation_date: "" };
+          newState = { ...formData, reservation_date: e.target.value };
         } else {
           if (Date.parse(e.target.value) < Date.now()) {
             setFormError({message: 'Past dates make no sense. Try again.'})
-            newState = { ...formData, reservation_date: "" };
+            newState = { ...formData, reservation_date: e.target.value };
           } else {
             setFormError(null)
             newState = { ...formData, reservation_date: e.target.value };
