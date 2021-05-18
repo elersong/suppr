@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { today } from "../utils/date-time";
+//import { today } from "../utils/date-time";
 import { Link, useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
+import ErrorAlert from "../layout/ErrorAlert";
 
 function ReservationForm( { setActiveDate } ) {
   const startingValues = {
@@ -14,6 +15,7 @@ function ReservationForm( { setActiveDate } ) {
   };
   const [formData, setFormData] = useState(startingValues);
   const [apiError, setApiError] = useState();
+  const [formError, setFormError] = useState();
   const history = useHistory();
 
   const handleSubmit = async (e) => {
@@ -47,6 +49,7 @@ function ReservationForm( { setActiveDate } ) {
     // e.preventDefault();
     let newState;
 
+
     switch (e.target.name) {
       case "first_name":
         newState = { ...formData, first_name: e.target.value };
@@ -65,7 +68,18 @@ function ReservationForm( { setActiveDate } ) {
         setFormData(newState);
         break;
       case "reservation_date":
-        newState = { ...formData, reservation_date: e.target.value };
+        if (new Date(e.target.value).getDay() === 1) {
+          setFormError({message: "Restaurant closed on Tuesdays. Select another day."})
+          newState = { ...formData, reservation_date: "" };
+        } else {
+          if (Date.parse(e.target.value) < Date.now()) {
+            setFormError({message: 'Past dates make no sense. Try again.'})
+            newState = { ...formData, reservation_date: "" };
+          } else {
+            setFormError(null)
+            newState = { ...formData, reservation_date: e.target.value };
+          }
+        }
         setFormData(newState);
         break;
       case "reservation_time":
@@ -81,6 +95,7 @@ function ReservationForm( { setActiveDate } ) {
 
   return (
     <div>
+      {formError && <ErrorAlert error={formError}/>}
     <form onSubmit={handleSubmit}>
       <label htmlFor="first_name">First Name: </label>
       <input
@@ -126,7 +141,7 @@ function ReservationForm( { setActiveDate } ) {
       <input
         type="date"
         name="reservation_date"
-        min={today()}
+        //min={today()}
         value={formData.reservation_date}
         onChange={handleChange}
         required
