@@ -54,7 +54,7 @@ const hasValidReservationData = (req, res, next) => {
 };
 
 const isDuringBusinessHours = (req, res, next) => {
-  const { reservation_time } = req.body.data;
+  const { reservation_time, reservation_date } = req.body.data;
 
   // Cannot be before 10:30:00
   let afterOpen = reservation_time.localeCompare('10:30:00') === 1
@@ -63,9 +63,15 @@ const isDuringBusinessHours = (req, res, next) => {
   let beforeClose = reservation_time.localeCompare('21:30:00') === -1
 
   // Cannot be in the past compared to current server time
-  let today = new Date();
-  let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  let inFuture = reservation_time.localeCompare(time) === 1
+  let inFuture;
+  if (Date.parse(reservation_date) === Date.now()) { // middleware already checks futurism
+    let today = new Date();
+    let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    inFuture = reservation_time.localeCompare(time) === 1
+  } else {
+    inFuture = true;
+  }
+  
 
   if (afterOpen && beforeClose && inFuture) {
     next();
