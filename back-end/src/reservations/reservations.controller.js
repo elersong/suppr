@@ -53,6 +53,31 @@ const hasValidReservationData = (req, res, next) => {
   }
 };
 
+const isDuringBusinessHours = (req, res, next) => {
+  const { reservation_time } = req.body.data;
+
+  // Cannot be before 10:30:00
+  let afterOpen = reservation_time.localeCompare('10:30:00') === 1
+
+  // Cannot be after 21:30:00
+  let beforeClose = reservation_time.localeCompare('21:30:00') === -1
+
+  // Cannot be in the past compared to current server time
+  let today = new Date();
+  let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  let inFuture = reservation_time.localeCompare(time) === 1
+
+  if (afterOpen && beforeClose && inFuture) {
+    next();
+  } else {
+    next({
+      status: 400,
+      message: "Reservation must be a future time between 10:30AM and 9:30PM."
+    })
+  }
+
+}
+
 // Middleware fxns ==========================================================
 
 // GET /reservations
@@ -79,5 +104,5 @@ async function create(req, res) {
 
 module.exports = {
   list,
-  create: [hasAllValidProperties, hasValidReservationData, asyncErrorBoundary(create)],
+  create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
 };
