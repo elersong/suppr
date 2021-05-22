@@ -1,19 +1,12 @@
 const knex = require("../db/connection");
+const {readReservation} = require("../reservations/reservations.service")
 
-// function update(updatedReview, review_id) {
-//   return knex("reviews")
-//     .select("*")
-//     .where({ review_id })
-//     .update(updatedReview, "*")
-//     .then((unneeded) => {
-//       return knex("reviews")
-//         .select("*")
-//         .where({ review_id })
-//         .join("critics as c", "c.critic_id", "reviews.critic_id")
-//         .select("reviews.*", "c.*")
-//         .then((data) => addCritic(data[0]));
-//     });
-// }
+function update(updatedTable, table_id) {
+  return knex("tables")
+    .select("*")
+    .where({ table_id })
+    .update(updatedTable, "*")
+}
 
 // function destroy(review_id) {
 //   return knex("reviews").select("*").where({ review_id }).del();
@@ -35,9 +28,10 @@ function create(newData) {
 }
 
 module.exports = {
-  //update,
+  update,
   //destroy,
   read,
+  readReservation,
   listAll,
   create,
   //listByDate,

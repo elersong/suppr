@@ -19,7 +19,7 @@ function destroy(review_id) {
   return knex("reviews").select("*").where({ review_id }).del();
 }
 
-function read(reservation_id) {
+function readReservation(reservation_id) {
   return knex("reservations").select("*").where({ reservation_id });
 }
 
@@ -43,7 +43,7 @@ function create(newData) {
 module.exports = {
   update,
   destroy,
-  read,
+  readReservation,
   listAll,
   create,
   listByDate,

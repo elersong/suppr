@@ -85,9 +85,8 @@ const isDuringBusinessHours = (req, res, next) => {
 }
 
 function reservationExists(req, res, next) {
-  console.log("does this exist?")
   service
-    .read(req.params.reservation_id)
+    .readReservation(req.params.reservation_id)
     .then((reserv) => {
       if (reserv) {
         res.locals.reservation = reserv[0];
@@ -130,5 +129,6 @@ async function read(req, res) {
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
-  read: [reservationExists, asyncErrorBoundary(read)]
+  read: [reservationExists, asyncErrorBoundary(read)],
+  reservationExists
 };
