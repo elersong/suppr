@@ -1,5 +1,5 @@
 /**
- * List handler for reservation resources
+ * List handler for table resources
  */
 const service = require("./tables.service");
 
@@ -10,105 +10,70 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 // Validation fxns ==========================================================
 
 const hasAllValidProperties = require("../errors/hasProperties")(
-  "first_name",
-  "last_name",
-  "mobile_number",
-  "reservation_date",
-  "reservation_time",
-  "people"
+  "table_name",
+  "capacity"
 );
 
-const hasValidReservationData = (req, res, next) => {
+const hasValidTableData = (req, res, next) => {
   const {
-    first_name,
-    last_name,
-    mobile_number,
-    reservation_date,
-    reservation_time,
-    people,
+    table_name,
+    capacity
   } = req.body.data;
+  let message, tableNameIsValid, capacityIsValid;
 
-  let message;
+  tableNameIsValid = table_name.length > 1;
+  capacityIsValid = (typeof capacity === 'number') && (capacity > 0)
 
-  const dateFormat = /\d\d\d\d-\d\d-\d\d/;
-  const timeFormat = /\d\d:\d\d/;
-
-  const dateFormatIsValid = reservation_date.match(dateFormat)?.length > 0;
-  const timeIsValid = reservation_time.match(timeFormat)?.length > 0;
-  const peopleIsValid = typeof people === 'number'
-
-  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(reservation_date) >= Date.now())
-  
-  if (dateFormatIsValid && !dateIsValid) {
-    message = "Restaurant closed. Date must be any future non-Tuesday."
-  }
-
-  if (dateFormatIsValid && dateIsValid && timeIsValid && peopleIsValid) {
-    next();
+  if (tableNameIsValid && capacityIsValid) {
+    return next();
   } else {
     next({
       status: 400,
-      message: message || "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}"
+      message: message || "Invalid data provided. Requires {string: table_name, number: capacity}"
     });
   }
 };
 
-const isDuringBusinessHours = (req, res, next) => {
-  const { reservation_time, reservation_date } = req.body.data;
-
-  // Cannot be before 10:30:00
-  let afterOpen = reservation_time.localeCompare('10:30:00') === 1
-
-  // Cannot be after 21:30:00
-  let beforeClose = reservation_time.localeCompare('21:30:00') === -1
-
-  // Cannot be in the past compared to current server time
-  let inFuture;
-  if (Date.parse(reservation_date) === Date.now()) { // middleware already checks futurism
-    let today = new Date();
-    let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    inFuture = reservation_time.localeCompare(time) === 1
-  } else {
-    inFuture = true;
-  }
-  
-
-  if (afterOpen && beforeClose && inFuture) {
-    next();
-  } else {
-    next({
-      status: 400,
-      message: "Reservation must be a future time between 10:30AM and 9:30PM."
+function tableExists(req, res, next) {
+  service
+    .read(req.params.table_id)
+    .then((table) => {
+      if (table) {
+        res.locals.table = table;
+        return next();
+      }
+      next({ status: 404, message: `Table cannot be found.` });
     })
-  }
-
+    .catch(next);
 }
 
 // Middleware fxns ==========================================================
 
-// GET /reservations
+// GET /tables
 async function list(req, res) {
-  let reservations;
-  if (req.query.date) {
-    reservations = await service.listByDate(req.query.date);
-  } else {
-    reservations = await service.listAll();
-  }
+  let tables = await service.listAll();
   
-  if (reservations.length > 1) {
-    reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+  if (tables.length > 1) {
+    tables = tables.sort((a,b) => a.table_name.localeCompare(b.table_name))
   }
 
-  res.json({ data: reservations });
+  res.json({ data: tables });
 }
 
-// POST /reservations
+// POST /tables
 async function create(req, res) {
   let incomingData = req.body.data;
   res.status(201).json({ data: await service.create(incomingData) });
 }
 
+// GET /tables/:table_id
+async function read(req, res) {
+  res.json({ data: res.locals.table });
+}
+
+
 module.exports = {
   list,
-  create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
+  create: [hasAllValidProperties, hasValidTableData, asyncErrorBoundary(create)],
+  read: [tableExists, asyncErrorBoundary(read)]
 };
