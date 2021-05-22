@@ -84,6 +84,20 @@ const isDuringBusinessHours = (req, res, next) => {
 
 }
 
+function reservationExists(req, res, next) {
+  console.log("does this exist?")
+  service
+    .read(req.params.reservation_id)
+    .then((reserv) => {
+      if (reserv) {
+        res.locals.reservation = reserv[0];
+        return next();
+      }
+      next({ status: 404, message: `Reservation cannot be found.` });
+    })
+    .catch(next);
+}
+
 // Middleware fxns ==========================================================
 
 // GET /reservations
@@ -108,7 +122,13 @@ async function create(req, res) {
   res.status(201).json({ data: await service.create(incomingData) });
 }
 
+// GET /reservations/:reservation_id
+async function read(req, res) {
+  res.json({ data: res.locals.reservation })
+}
+
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
+  read: [reservationExists, asyncErrorBoundary(read)]
 };
