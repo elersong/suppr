@@ -49,6 +49,8 @@ const tableExists = (req, res, next) => {
   service
     .read(req.params.table_id)
     .then((table) => {
+      console.log("RECEIVED TABLE ID:", req.params.table_id)
+      console.log("DATA RETRIEVED: ", table)
       if (table) {
         res.locals.table = table[0];
         return next();

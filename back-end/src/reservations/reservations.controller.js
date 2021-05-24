@@ -37,8 +37,8 @@ const hasValidReservationData = (req, res, next) => {
   const timeIsValid = reservation_time.match(timeFormat)?.length > 0;
   const peopleIsValid = typeof people === 'number'
 
-  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(reservation_date) >= Date.now())
-  
+  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(`${reservation_date} ${reservation_time}`) >= Date.now())
+
   if (dateFormatIsValid && !dateIsValid) {
     message = "Restaurant closed. Date must be any future non-Tuesday."
   }
