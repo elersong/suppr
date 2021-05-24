@@ -90,3 +90,59 @@ export async function createReservation(reservationInfo, signal) {
   return await fetchJson(url, options);
 }
 
+/**
+ * Creates a new table, sending a POST request to /tables/new
+ *
+ * @param tableInfo
+ *  an object, describing the table to create, which must have proper properties
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to the new table, which will have a `table_id` property.
+ */
+ export async function createTable(tableInfo, signal) {
+  const url = `${API_BASE_URL}/tables`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({"data": tableInfo}),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+/**
+ * Retrieves all existing tables.
+ * @returns {Promise<[reservation]>}
+ *  a promise that resolves to a possibly empty array of tables saved in the database.
+ */
+
+ export async function listTables(params, signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  Object.entries(params).forEach(([key, value]) =>
+    url.searchParams.append(key, value.toString())
+  );
+  return await fetchJson(url, { headers, signal }, []);
+}
+
+
+/**
+ * Seats a reservation at a table, sending a PUT request to /reservations/:reservation_id/seat
+ *
+ * @param tableInfo
+ *  an object, describing the table to create, which must have proper properties
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to the new table, which will have a `table_id` property.
+ */
+ export async function seatTable(tableInfo, signal) {
+  const url = `${API_BASE_URL}/tables/${tableInfo.table_id}/seat`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({"data": {"reservation_id": tableInfo.reservation_id}}),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
