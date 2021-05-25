@@ -1,10 +1,11 @@
 import React from "react";
-import { resetTable } from "../utils/api"
+import { resetTable, changeStatus } from "../utils/api"
 
-export default function ResetTable({ triggerRender, table_id }) {
+export default function ResetTable({ triggerRender, reservation_id, table_id }) {
 
   const handleReset = () => {
-    resetTable(table_id)
+    resetTable({table_id, reservation_id})
+    .then(changeStatus("finished", reservation_id))
     .then(triggerRender);
   }
 

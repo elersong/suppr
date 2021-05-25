@@ -156,11 +156,32 @@ export async function createReservation(reservationInfo, signal) {
  * @returns {Promise<Error|*>}
  *  a promise that resolves to a table row, which will have a null `reservation_id` property.
  */
- export async function resetTable(tableId) {
-  const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+ export async function resetTable(tableData) {
+  const url = `${API_BASE_URL}/tables/${tableData.table_id}/seat`;
   const options = {
     method: "DELETE",
-    headers
+    headers,
+    body: JSON.stringify({"data": {"reservation_id": tableData.reservation_id}})
+  };
+  return await fetchJson(url, options, {});
+}
+
+/**
+ * Updates the status of an existing reservation, sending a PUT request to /reservations/:reservation_id/status
+ *
+ * @param tableId
+ *  the ID of the table to free-up
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to a table row, which will have a null `reservation_id` property.
+ */
+ export async function changeStatus(status, reservation_id) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({"data": {"status": status}})
   };
   return await fetchJson(url, options, {});
 }

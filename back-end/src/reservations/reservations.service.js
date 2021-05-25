@@ -1,18 +1,10 @@
 const knex = require("../db/connection");
 
-function update(updatedReview, review_id) {
-  return knex("reviews")
+function update(updatedReservation, reservation_id) {
+  return knex("reservations")
     .select("*")
-    .where({ review_id })
-    .update(updatedReview, "*")
-    .then((unneeded) => {
-      return knex("reviews")
-        .select("*")
-        .where({ review_id })
-        .join("critics as c", "c.critic_id", "reviews.critic_id")
-        .select("reviews.*", "c.*")
-        .then((data) => addCritic(data[0]));
-    });
+    .where({ reservation_id })
+    .update(updatedReservation, "*")
 }
 
 function destroy(review_id) {

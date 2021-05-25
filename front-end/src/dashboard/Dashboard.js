@@ -27,6 +27,9 @@ function Dashboard({ date, setActiveDate }) {
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
+      .then(data => {
+        return data.filter(reservation => reservation.status !== "finished")
+      })
       .then(setReservations)
       .catch(setReservationsError);
     listTables({}, abortController.signal).then(setTables);
@@ -116,7 +119,7 @@ function Dashboard({ date, setActiveDate }) {
                             >
                               Finish
                             </button>
-                            <ResetTable triggerRender={forceRerender} table_id={table.table_id} />
+                            <ResetTable triggerRender={forceRerender} reservation_id={table.reservation_id} table_id={table.table_id} />
                           </div>
                         )}
                       </td>
