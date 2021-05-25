@@ -4,7 +4,6 @@ import ErrorAlert from "../layout/ErrorAlert";
 import ReservationDisplay from "./ReservationDisplay";
 import { today, previous, next } from "../utils/date-time";
 import "./Dashboard.css";
-import FinishSeatingModal from "./FinishSeatingModal";
 
 /**
  * Defines the dashboard page.
@@ -16,10 +15,6 @@ function Dashboard({ date, setActiveDate }) {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-  const [modalIsOpen, setIsOpen] = useState(false);
-
-  const openModal = () => {setIsOpen(true);}
-  const closeModal = () => {setIsOpen(false);}
 
   // eslint-disable-next-line
   useEffect(loadDashboard, [date]);
@@ -51,7 +46,6 @@ function Dashboard({ date, setActiveDate }) {
 
   return (
     <main className="d-flex flex-column">
-      <FinishSeatingModal modalIsOpen={modalIsOpen} closeModal={closeModal} />
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for date: {date}</h4>
@@ -99,7 +93,7 @@ function Dashboard({ date, setActiveDate }) {
                       <th scope="row">{table.table_name}</th>
                       <td>{table.capacity}</td>
                       <td data-table-id-status={table.table_id}>{table.reservation_id === null ? "Free" : "Occupied"}</td>
-                      <td>{table.reservation_id && <button data-table-id-finish={table.table_id} onClick={openModal} className="btn btn-warning">Finish</button>}</td>
+                      <td><button className="btn btn-primary">Click</button></td>
                     </tr>
                   )
                 })}
