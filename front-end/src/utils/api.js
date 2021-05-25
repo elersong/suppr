@@ -127,7 +127,7 @@ export async function createReservation(reservationInfo, signal) {
 
 
 /**
- * Seats a reservation at a table, sending a PUT request to /reservations/:reservation_id/seat
+ * Seats a reservation at a table, sending a PUT request to /tables/:table_id/seat
  *
  * @param tableInfo
  *  an object, describing the table to create, which must have proper properties
@@ -142,6 +142,25 @@ export async function createReservation(reservationInfo, signal) {
     method: "PUT",
     headers,
     body: JSON.stringify({"data": {"reservation_id": tableInfo.reservation_id}}),
+  };
+  return await fetchJson(url, options, {});
+}
+
+/**
+ * Resets an occupied table, sending a DELETE request to /tables/:table_id/seat
+ *
+ * @param tableId
+ *  the ID of the table to free-up
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to a table row, which will have a null `reservation_id` property.
+ */
+ export async function resetTable(tableId) {
+  const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+  const options = {
+    method: "DELETE",
+    headers
   };
   return await fetchJson(url, options, {});
 }
