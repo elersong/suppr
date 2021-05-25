@@ -127,10 +127,17 @@ async function seat(req, res) {
   res.json({ data: await service.update(newTableData, newTableData.table_id) })
 }
 
+// DELETE /tables/:table_id/seat
+async function reset(req, res) {
+  let newTableData = res.locals.table;
+  newTableData.reservation_id = null;
+  res.json({ data: await service.update(newTableData, newTableData.table_id) })
+}
 
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidTableData, asyncErrorBoundary(create)],
   read: [tableExists, asyncErrorBoundary(read)],
   seat: [hasData, tableExists, reservationExists, hasSufficientCapacity, isVacant, asyncErrorBoundary(seat)],
+  reset: [tableExists, asyncErrorBoundary(reset)]
 };
