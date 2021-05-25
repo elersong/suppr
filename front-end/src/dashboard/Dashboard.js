@@ -4,6 +4,7 @@ import ErrorAlert from "../layout/ErrorAlert";
 import ReservationDisplay from "./ReservationDisplay";
 import { today, previous, next } from "../utils/date-time";
 import "./Dashboard.css";
+import ResetTable from "./ResetTable";
 
 /**
  * Defines the dashboard page.
@@ -25,8 +26,7 @@ function Dashboard({ date, setActiveDate }) {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    listTables({}, abortController.signal)
-      .then(setTables)
+    listTables({}, abortController.signal).then(setTables);
     return () => abortController.abort();
   }
 
@@ -71,7 +71,13 @@ function Dashboard({ date, setActiveDate }) {
           <ErrorAlert error={reservationsError} />
           {reservations.length > 0 &&
             reservations.map((reservation, idx) => {
-              return <ReservationDisplay reservation={reservation} key={idx} setActiveDate={setActiveDate} />;
+              return (
+                <ReservationDisplay
+                  reservation={reservation}
+                  key={idx}
+                  setActiveDate={setActiveDate}
+                />
+              );
             })}
         </div>
         <div className="col-md-6 col-sm-12" id="dashboardTables">
@@ -86,16 +92,33 @@ function Dashboard({ date, setActiveDate }) {
               </tr>
             </thead>
             <tbody>
-              {tables.length > 0 && 
+              {tables.length > 0 &&
                 tables.map((table, idx) => {
                   return (
                     <tr key={`table-${idx}`}>
                       <th scope="row">{table.table_name}</th>
                       <td>{table.capacity}</td>
-                      <td data-table-id-status={table.table_id}>{table.reservation_id === null ? "Free" : "Occupied"}</td>
-                      <td>{table.reservation_id && <button type="button" className="btn btn-warning">Finish</button>}</td>
+                      <td data-table-id-status={table.table_id}>
+                        {table.reservation_id === null ? "Free" : "Occupied"}
+                      </td>
+                      <td>
+                        {table.reservation_id && (
+                          <div>
+                            <button
+                              type="button"
+                              className="btn btn-warning"
+                              data-table-id-finish={table.table_id}
+                              data-toggle="modal"
+                              data-target="#exampleModalCenter"
+                            >
+                              Finish
+                            </button>
+                            <ResetTable table_id={table.table_id} />
+                          </div>
+                        )}
+                      </td>
                     </tr>
-                  )
+                  );
                 })}
             </tbody>
           </table>
