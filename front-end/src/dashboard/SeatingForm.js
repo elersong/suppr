@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { seatTable, listTables, listReservations } from "../utils/api";
+import { seatTable, changeStatus, listTables, listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
 function SeatingForm({ date }) {
@@ -52,6 +52,7 @@ function SeatingForm({ date }) {
     e.stopPropagation();
     setSubmitError(null);
     seatTable(formData)
+      .then(changeStatus("seated", formData.reservation_id))
       .then(() => history.push('/dashboard'))
       .catch(setSubmitError);
   };

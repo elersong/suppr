@@ -16,7 +16,22 @@ function ReservationDisplay({ reservation, setActiveDate }) {
     reservation_date,
     reservation_time,
     people,
+    status,
   } = reservation;
+
+  const seatingButton = () => {
+    return (
+      <Link to={`/reservations/${reservation_id}/seat`}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => setActiveDate(reservation_date)}
+        >
+          Seat
+        </button>
+      </Link>
+    );
+  };
+
   return (
     <div className="card">
       <div className="card-body">
@@ -24,9 +39,8 @@ function ReservationDisplay({ reservation, setActiveDate }) {
         <h6>{`phone: ${mobile_number}`}</h6>
         <h6>{`date: ${reservation_date} @ ${reservation_time}`}</h6>
         <h6>{`party size: ${people}`}</h6>
-        <Link to={`/reservations/${reservation_id}/seat`}>
-          <button className="btn btn-secondary" onClick={() => setActiveDate(reservation_date)}>Seat</button>
-        </Link>
+        <h6 data-reservation-id-status={reservation.reservation_id}>{`status: ${status}`}</h6>
+        {status === "booked" && seatingButton()}
       </div>
     </div>
   );
