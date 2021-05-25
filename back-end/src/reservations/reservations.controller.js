@@ -126,9 +126,18 @@ async function read(req, res) {
   res.json({ data: res.locals.reservation })
 }
 
+// PUT /reservations/:reservation_id/status
+async function updateStatus(req, res) {
+  let newStatus = req.body.data.status;
+  let newReservationData = res.locals.reservation;
+  newReservationData.status = newStatus;
+  res.json({ data: await service.update(newReservationData, newReservationData.reservation_id) });
+}
+
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
   read: [reservationExists, asyncErrorBoundary(read)],
-  reservationExists
+  reservationExists,
+  updateStatus: [reservationExists, asyncErrorBoundary(updateStatus)]
 };

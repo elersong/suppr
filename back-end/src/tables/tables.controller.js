@@ -139,5 +139,5 @@ module.exports = {
   create: [hasAllValidProperties, hasValidTableData, asyncErrorBoundary(create)],
   read: [tableExists, asyncErrorBoundary(read)],
   seat: [hasData, tableExists, reservationExists, hasSufficientCapacity, isVacant, asyncErrorBoundary(seat)],
-  reset: [tableExists, asyncErrorBoundary(reset)]
+  reset: [tableExists, reservationExists, asyncErrorBoundary(reset)]
 };
