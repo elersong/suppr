@@ -1,10 +1,11 @@
 import React from "react";
 import { resetTable } from "../utils/api"
 
-export default function ResetTable({ table_id }) {
+export default function ResetTable({ triggerRender, table_id }) {
 
   const handleReset = () => {
-    resetTable(table_id);
+    resetTable(table_id)
+    .then(triggerRender);
   }
 
   return (
@@ -40,7 +41,7 @@ export default function ResetTable({ table_id }) {
             >
               Cancel
             </button>
-            <button onClick={handleReset} type="button" className="btn btn-danger">
+            <button onClick={handleReset} data-dismiss="modal" type="button" className="btn btn-danger">
               Finish
             </button>
           </div>

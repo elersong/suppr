@@ -16,9 +16,12 @@ function Dashboard({ date, setActiveDate }) {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const [rerender, setRerender] = useState(true);
+
+  const forceRerender = () => {setRerender(!rerender)}
 
   // eslint-disable-next-line
-  useEffect(loadDashboard, [date]);
+  useEffect(loadDashboard, [date, rerender]);
 
   function loadDashboard() {
     const abortController = new AbortController();
@@ -113,7 +116,7 @@ function Dashboard({ date, setActiveDate }) {
                             >
                               Finish
                             </button>
-                            <ResetTable table_id={table.table_id} />
+                            <ResetTable triggerRender={forceRerender} table_id={table.table_id} />
                           </div>
                         )}
                       </td>
