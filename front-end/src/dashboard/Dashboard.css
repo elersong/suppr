@@ -1,0 +1,12 @@
+#root {
+  height: 100vh;
+}
+
+#root .container-fluid {
+  height: 100vh;
+}
+
+.navbar .container-fluid {
+  justify-content: start;
+}
+

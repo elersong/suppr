@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 /**
  * Displays the details of one reservation
  * @param reservation
@@ -7,8 +7,16 @@ import React from "react";
  * @returns {JSX.Element}
  */
 
-function ReservationDisplay({ reservation }) {  
-  const {reservation_id, first_name, last_name, mobile_number, reservation_date, reservation_time, people} = reservation;
+function ReservationDisplay({ reservation, setActiveDate }) {
+  const {
+    reservation_id,
+    first_name,
+    last_name,
+    mobile_number,
+    reservation_date,
+    reservation_time,
+    people,
+  } = reservation;
   return (
     <div className="card">
       <div className="card-body">
@@ -16,6 +24,9 @@ function ReservationDisplay({ reservation }) {
         <h6>{`phone: ${mobile_number}`}</h6>
         <h6>{`date: ${reservation_date} @ ${reservation_time}`}</h6>
         <h6>{`party size: ${people}`}</h6>
+        <Link to={`/reservations/${reservation_id}/seat`}>
+          <button className="btn btn-secondary" onClick={() => setActiveDate(reservation_date)}>Seat</button>
+        </Link>
       </div>
     </div>
   );

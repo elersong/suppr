@@ -37,8 +37,8 @@ const hasValidReservationData = (req, res, next) => {
   const timeIsValid = reservation_time.match(timeFormat)?.length > 0;
   const peopleIsValid = typeof people === 'number'
 
-  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(reservation_date) >= Date.now())
-  
+  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(`${reservation_date} ${reservation_time}`) >= Date.now())
+
   if (dateFormatIsValid && !dateIsValid) {
     message = "Restaurant closed. Date must be any future non-Tuesday."
   }
@@ -84,6 +84,19 @@ const isDuringBusinessHours = (req, res, next) => {
 
 }
 
+function reservationExists(req, res, next) {
+  service
+    .readReservation(req.params.reservation_id)
+    .then((reserv) => {
+      if (reserv) {
+        res.locals.reservation = reserv[0];
+        return next();
+      }
+      next({ status: 404, message: `Reservation cannot be found.` });
+    })
+    .catch(next);
+}
+
 // Middleware fxns ==========================================================
 
 // GET /reservations
@@ -108,7 +121,14 @@ async function create(req, res) {
   res.status(201).json({ data: await service.create(incomingData) });
 }
 
+// GET /reservations/:reservation_id
+async function read(req, res) {
+  res.json({ data: res.locals.reservation })
+}
+
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
+  read: [reservationExists, asyncErrorBoundary(read)],
+  reservationExists
 };
