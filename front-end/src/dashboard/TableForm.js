@@ -91,8 +91,7 @@ function TableForm( ) {
       <br></br>
 
       <button type="submit">Submit</button>
-      
-        <button onClick={history.goBack} className="btn btn-secondary">Cancel</button>
+      <button type="button" onClick={history.goBack} className="btn btn-secondary">Cancel</button>
     </form>
     </div>
   );

@@ -136,13 +136,12 @@ export async function createReservation(reservationInfo, signal) {
  * @returns {Promise<Error|*>}
  *  a promise that resolves to the new table, which will have a `table_id` property.
  */
- export async function seatTable(tableInfo, signal) {
+ export async function seatTable(tableInfo) {
   const url = `${API_BASE_URL}/tables/${tableInfo.table_id}/seat`;
   const options = {
     method: "PUT",
     headers,
     body: JSON.stringify({"data": {"reservation_id": tableInfo.reservation_id}}),
-    signal,
   };
-  return await fetchJson(url, options);
+  return await fetchJson(url, options, {});
 }

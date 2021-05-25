@@ -14,17 +14,19 @@ function SeatingForm({ date }) {
   const [tableData, setTableData] = useState([]);
   const [reservationData, setReservationData] = useState();
 
-  const [apiError, setApiError] = useState();
+  const [submitError, setSubmitError] = useState(null);
   const [formError, setFormError] = useState();
 
   const history = useHistory();
 
+  // eslint-disable-next-line
   useEffect(loadData, [date, reservation_id]);
 
   // Look up data for all tables
   // Look up data for all reservations, find the current one
   function loadData() {
     const abortController = new AbortController();
+
     listReservations({ date }, abortController.signal)
       .then((data) =>
         setReservationData(
@@ -32,35 +34,26 @@ function SeatingForm({ date }) {
         )
       )
       .catch(setFormError);
+
     listTables({}, abortController.signal)
       .then((data) => data.filter((table) => !table.reservation_id))
+      .then(data => {
+        startingValues.table_id = data[0].table_id
+        setFormData(startingValues)
+        return data
+      })
       .then(setTableData);
+
     return () => abortController.abort();
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const ABORT = new AbortController();
-    const runUpdateFunction = async () => {
-      try {
-        const response = await seatTable(formData, ABORT.signal);
-        console.log("Table Seated", response);
-      } catch (err) {
-        if (err.name === "AbortError") {
-          console.log(err);
-        } else {
-          await setApiError(err);
-        }
-      }
-    };
-    await runUpdateFunction();
-    if (!apiError) {
-      history.push("/dashboard");
-    }
-
-    return () => {
-      ABORT.abort();
-    };
+    e.stopPropagation();
+    setSubmitError(null);
+    seatTable(formData)
+      .then(() => history.push('/dashboard'))
+      .catch(setSubmitError);
   };
 
   const getCapacity = (id) => {
@@ -83,6 +76,7 @@ function SeatingForm({ date }) {
   return (
     <div>
       {formError && <ErrorAlert error={formError} />}
+      {submitError && <ErrorAlert error={submitError} />}
       {reservationData &&
         <div className="card">
         <div className="card-body">
@@ -95,6 +89,7 @@ function SeatingForm({ date }) {
       <form onSubmit={handleSubmit}>
         <label htmlFor="table_id">Select Table: </label>
         <select
+          id="table_id"
           name="table_id"
           value={formData.table_id}
           onChange={handleChange}
@@ -114,7 +109,7 @@ function SeatingForm({ date }) {
 
         <button type="submit">Submit</button>
 
-        <button onClick={history.goBack} className="btn btn-secondary">
+        <button type="button" onClick={history.goBack} className="btn btn-secondary">
           Cancel
         </button>
       </form>
