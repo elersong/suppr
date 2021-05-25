@@ -93,7 +93,7 @@ function Dashboard({ date, setActiveDate }) {
                       <th scope="row">{table.table_name}</th>
                       <td>{table.capacity}</td>
                       <td data-table-id-status={table.table_id}>{table.reservation_id === null ? "Free" : "Occupied"}</td>
-                      <td><button className="btn btn-primary">Click</button></td>
+                      <td>{table.reservation_id && <button type="button" className="btn btn-warning">Finish</button>}</td>
                     </tr>
                   )
                 })}
