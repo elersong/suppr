@@ -185,3 +185,18 @@ export async function createReservation(reservationInfo, signal) {
   };
   return await fetchJson(url, options, {});
 }
+
+
+/**
+ * Retrieves reservations with matching phone numbers
+ * @returns {Promise<[reservation]>}
+ *  a promise that resolves to a possibly empty array of tables saved in the database.
+ */
+
+ export async function searchReservation(params, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations`);
+  Object.entries(params).forEach(([key, value]) =>
+    url.searchParams.append(key, value.toString())
+  );
+  return await fetchJson(url, { headers, signal }, []);
+}
