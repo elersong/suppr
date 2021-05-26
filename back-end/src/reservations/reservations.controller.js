@@ -104,6 +104,8 @@ async function list(req, res) {
   let reservations;
   if (req.query.date) {
     reservations = await service.listByDate(req.query.date);
+  } else if (req.query.mobile_number) {
+    reservations = await service.search(req.query.mobile_number)
   } else {
     reservations = await service.listAll();
   }

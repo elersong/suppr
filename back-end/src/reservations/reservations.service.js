@@ -32,6 +32,15 @@ function create(newData) {
     .then((createdRecords) => createdRecords[0]);
 }
 
+function search(mobile_number) {
+  return knex("reservations")
+    .whereRaw(
+      "translate(mobile_number, '(). -', '') like ?",
+      `%${mobile_number.replace(/\D/g, "")}%`
+    )
+    .orderBy("reservation_date");
+}
+
 module.exports = {
   update,
   destroy,
@@ -39,4 +48,5 @@ module.exports = {
   listAll,
   create,
   listByDate,
+  search,
 };
