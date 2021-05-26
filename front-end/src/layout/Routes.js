@@ -6,6 +6,7 @@ import NotFound from "./NotFound";
 import ReservationForm from "../dashboard/ReservationForm";
 import TableForm from "../dashboard/TableForm";
 import SeatingForm from "../dashboard/SeatingForm";
+import Search from "../dashboard/Search"
 import { today } from "../utils/date-time";
 
 /**
@@ -22,6 +23,9 @@ function Routes() {
     <Switch>
       <Route exact={true} path="/">
         <Redirect to={"/dashboard"} />
+      </Route>
+      <Route exact={true} path="/search">
+        <Search setActiveDate={setActiveDate} />
       </Route>
       <Route exact={true} path="/tables/new">
         <TableForm />
