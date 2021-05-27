@@ -32,6 +32,18 @@ function ReservationDisplay({ reservation, setActiveDate }) {
     );
   };
 
+  const editButton = () => {
+    return (
+      <Link to={`/reservations/${reservation_id}/edit`}>
+        <button
+          className="btn btn-secondary"
+        >
+          Edit
+        </button>
+      </Link>
+    );
+  };
+
   return (
     <div className="card">
       <div className="card-body">
@@ -41,6 +53,7 @@ function ReservationDisplay({ reservation, setActiveDate }) {
         <h6>{`party size: ${people}`}</h6>
         <h6 data-reservation-id-status={reservation.reservation_id}>{`status: ${status}`}</h6>
         {status === "booked" && seatingButton()}
+        {status !== "finished" && editButton()}
       </div>
     </div>
   );

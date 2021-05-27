@@ -33,6 +33,9 @@ function Routes() {
       <Route exact={true} path="/reservations/new">
         <ReservationForm setActiveDate={setActiveDate} />
       </Route>
+      <Route exact={true} path="/reservations/:reservation_id/edit">
+        <ReservationForm setActiveDate={setActiveDate} />
+      </Route>
       <Route exact={true} path="/reservations/:reservation_id/seat">
         <SeatingForm date={activeDate} />
       </Route>
