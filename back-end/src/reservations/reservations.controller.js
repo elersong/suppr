@@ -97,6 +97,17 @@ function reservationExists(req, res, next) {
     .catch(next);
 }
 
+function hasBookedStatus(req, res, next) {
+  if (req.body.data.status === "booked") {
+    next();
+  } else {
+    next({
+      status: 400,
+      message: "Only reservations with status 'booked' can be edited."
+    })
+  }
+}
+
 // Middleware fxns ==========================================================
 
 // GET /reservations
@@ -136,10 +147,17 @@ async function updateStatus(req, res) {
   res.json({ data: await service.update(newReservationData, newReservationData.reservation_id) });
 }
 
+// PUT /reservations/:reservation_id
+async function updateReservation(req, res) {
+  let newReservationData = req.body.data;
+  res.json({ data: await service.update(newReservationData, newReservationData.reservation_id) });
+}
+
 module.exports = {
   list,
   create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
   read: [reservationExists, asyncErrorBoundary(read)],
   reservationExists,
-  updateStatus: [reservationExists, asyncErrorBoundary(updateStatus)]
+  updateStatus: [reservationExists, asyncErrorBoundary(updateStatus)],
+  updateReservation: [reservationExists, hasBookedStatus, asyncErrorBoundary(updateReservation)]
 };
