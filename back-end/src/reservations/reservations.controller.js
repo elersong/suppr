@@ -39,9 +39,9 @@ const hasValidReservationData = (req, res, next) => {
 
   const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(`${reservation_date} ${reservation_time}`) >= Date.now())
 
-  if (dateFormatIsValid && !dateIsValid) {
+  if (dateFormatIsValid && timeIsValid && !dateIsValid) {
     message = "Restaurant closed. Date must be any future non-Tuesday."
-  }
+  } 
 
   if (dateFormatIsValid && dateIsValid && timeIsValid && peopleIsValid) {
     next();
@@ -88,7 +88,7 @@ function reservationExists(req, res, next) {
   service
     .readReservation(req.params.reservation_id)
     .then((reserv) => {
-      if (reserv) {
+      if (reserv.length > 0) {
         res.locals.reservation = reserv[0];
         return next();
       }
@@ -159,5 +159,5 @@ module.exports = {
   read: [reservationExists, asyncErrorBoundary(read)],
   reservationExists,
   updateStatus: [reservationExists, asyncErrorBoundary(updateStatus)],
-  updateReservation: [reservationExists, hasBookedStatus, asyncErrorBoundary(updateReservation)]
+  updateReservation: [hasAllValidProperties, hasValidReservationData, reservationExists, hasBookedStatus, asyncErrorBoundary(updateReservation)]
 };
