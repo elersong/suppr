@@ -35,20 +35,24 @@ const hasValidReservationData = (req, res, next) => {
 
   const dateFormatIsValid = reservation_date.match(dateFormat)?.length > 0;
   const timeIsValid = reservation_time.match(timeFormat)?.length > 0;
-  const peopleIsValid = typeof people === 'number'
+  const peopleIsValid = typeof people === "number";
 
-  const dateIsValid = (new Date(reservation_date).getDay() !== 1) && (Date.parse(`${reservation_date} ${reservation_time}`) >= Date.now())
+  const dateIsValid =
+    new Date(reservation_date).getDay() !== 1 &&
+    Date.parse(`${reservation_date} ${reservation_time}`) >= Date.now();
 
   if (dateFormatIsValid && timeIsValid && !dateIsValid) {
-    message = "Restaurant closed. Date must be any future non-Tuesday."
-  } 
+    message = "Restaurant closed. Date must be any future non-Tuesday.";
+  }
 
   if (dateFormatIsValid && dateIsValid && timeIsValid && peopleIsValid) {
     next();
   } else {
     next({
       status: 400,
-      message: message || "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}"
+      message:
+        message ||
+        "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}",
     });
   }
 };
@@ -57,32 +61,32 @@ const isDuringBusinessHours = (req, res, next) => {
   const { reservation_time, reservation_date } = req.body.data;
 
   // Cannot be before 10:30:00
-  let afterOpen = reservation_time.localeCompare('10:30:00') === 1
+  let afterOpen = reservation_time.localeCompare("10:30:00") === 1;
 
   // Cannot be after 21:30:00
-  let beforeClose = reservation_time.localeCompare('21:30:00') === -1
+  let beforeClose = reservation_time.localeCompare("21:30:00") === -1;
 
   // Cannot be in the past compared to current server time
   let inFuture;
-  if (Date.parse(reservation_date) === Date.now()) { // middleware already checks futurism
+  if (Date.parse(reservation_date) === Date.now()) {
+    // middleware already checks futurism
     let today = new Date();
-    let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    inFuture = reservation_time.localeCompare(time) === 1
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    inFuture = reservation_time.localeCompare(time) === 1;
   } else {
     inFuture = true;
   }
-  
 
   if (afterOpen && beforeClose && inFuture) {
     next();
   } else {
     next({
       status: 400,
-      message: "Reservation must be a future time between 10:30AM and 9:30PM."
-    })
+      message: "Reservation must be a future time between 10:30AM and 9:30PM.",
+    });
   }
-
-}
+};
 
 function reservationExists(req, res, next) {
   service
@@ -103,8 +107,8 @@ function hasBookedStatus(req, res, next) {
   } else {
     next({
       status: 400,
-      message: "Only reservations with status 'booked' can be edited."
-    })
+      message: "Only reservations with status 'booked' can be edited.",
+    });
   }
 }
 
@@ -116,13 +120,15 @@ async function list(req, res) {
   if (req.query.date) {
     reservations = await service.listByDate(req.query.date);
   } else if (req.query.mobile_number) {
-    reservations = await service.search(req.query.mobile_number)
+    reservations = await service.search(req.query.mobile_number);
   } else {
     reservations = await service.listAll();
   }
-  
+
   if (reservations.length > 1) {
-    reservations = reservations.sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+    reservations = reservations.sort((a, b) =>
+      a.reservation_time.localeCompare(b.reservation_time)
+    );
   }
 
   res.json({ data: reservations });
@@ -136,7 +142,7 @@ async function create(req, res) {
 
 // GET /reservations/:reservation_id
 async function read(req, res) {
-  res.json({ data: res.locals.reservation })
+  res.json({ data: res.locals.reservation });
 }
 
 // PUT /reservations/:reservation_id/status
@@ -144,20 +150,44 @@ async function updateStatus(req, res) {
   let newStatus = req.body.data.status;
   let newReservationData = res.locals.reservation;
   newReservationData.status = newStatus;
-  res.json({ data: await service.update(newReservationData, newReservationData.reservation_id) });
+  res.json({
+    data: await service.update(
+      newReservationData,
+      newReservationData.reservation_id
+    ),
+  });
 }
 
 // PUT /reservations/:reservation_id
 async function updateReservation(req, res) {
   let newReservationData = req.body.data;
-  res.json({ data: await service.update(newReservationData, newReservationData.reservation_id) });
+  res.json({
+    data: await service.update(
+      newReservationData,
+      newReservationData.reservation_id
+    ),
+  });
 }
 
 module.exports = {
   list,
-  create: [hasAllValidProperties, hasValidReservationData, isDuringBusinessHours, asyncErrorBoundary(create)],
-  read: [reservationExists, asyncErrorBoundary(read)],
+  create: [
+    asyncErrorBoundary(hasAllValidProperties),
+    asyncErrorBoundary(hasValidReservationData),
+    asyncErrorBoundary(isDuringBusinessHours),
+    asyncErrorBoundary(create),
+  ],
+  read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
   reservationExists,
-  updateStatus: [reservationExists, asyncErrorBoundary(updateStatus)],
-  updateReservation: [hasAllValidProperties, hasValidReservationData, reservationExists, hasBookedStatus, asyncErrorBoundary(updateReservation)]
+  updateStatus: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(updateStatus),
+  ],
+  updateReservation: [
+    asyncErrorBoundary(hasAllValidProperties),
+    asyncErrorBoundary(hasValidReservationData),
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(hasBookedStatus),
+    asyncErrorBoundary(updateReservation),
+  ],
 };
