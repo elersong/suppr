@@ -76,7 +76,7 @@ function ReservationForm( { setActiveDate } ) {
     const runUpdateFunction = async () => {
       try {
         const response = await updateReservation(formData, ABORT.signal);
-        await setActiveDate(formData.reservation_date)
+        setActiveDate(formData.reservation_date)
         console.log("Reservation Updated", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -88,7 +88,7 @@ function ReservationForm( { setActiveDate } ) {
     };
     await runUpdateFunction();
     if (!apiError) {
-      history.goBack();
+      history.push('/dashboard');
     }
 
     return () => {
