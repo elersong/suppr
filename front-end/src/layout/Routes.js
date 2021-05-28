@@ -8,6 +8,7 @@ import TableForm from "../dashboard/TableForm";
 import SeatingForm from "../dashboard/SeatingForm";
 import Search from "../dashboard/Search"
 import { today } from "../utils/date-time";
+import useQuery from "../utils/useQuery";
 
 /**
  * Defines all the routes for the application.
@@ -18,7 +19,11 @@ import { today } from "../utils/date-time";
  */
 function Routes() {
   const [activeDate, setActiveDate] = useState(today());
-
+  let query = useQuery();
+  if (query.get("date") && query.get("date") !== activeDate) {
+    setActiveDate(query.get("date"))
+  }
+  
   return (
     <Switch>
       <Route exact={true} path="/">
