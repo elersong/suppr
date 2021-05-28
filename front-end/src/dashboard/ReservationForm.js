@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-//import { today } from "../utils/date-time";
-import { Link, useHistory } from "react-router-dom";
-import { createReservation } from "../utils/api";
+import React, { useState, useEffect } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { createReservation, readReservation, updateReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
 function ReservationForm( { setActiveDate } ) {
-  const startingValues = {
+  let startingValues = {
     first_name: "",
     last_name: "",
     mobile_number: "",
@@ -13,18 +12,45 @@ function ReservationForm( { setActiveDate } ) {
     reservation_date: "",
     reservation_time: "",
   };
+  const { reservation_id } = useParams();
+
   const [formData, setFormData] = useState(startingValues);
   const [apiError, setApiError] = useState();
   const [formError, setFormError] = useState();
   const history = useHistory();
 
+  useEffect(loadReservation, [reservation_id])
+
+  // check for a reservation_id in the url
+  // if it isn't there, then this is a new reservation, so don't load anything
+  function loadReservation() {
+    if (reservation_id === undefined) return null;
+    const abortController = new AbortController();
+    readReservation({ reservation_id }, abortController.signal)
+      .then(data => {
+        data.reservation_date = new Date(data.reservation_date).toISOString().split("T")[0];
+        return data;
+      })
+      .then(setFormData)
+      .catch(setApiError);
+    return () => abortController.abort();
+  }
+
   const handleSubmit = async (e) => {
+    if (reservation_id === undefined) {
+      await handleNewSubmit(e)
+    } else {
+      await handleUpdate(e)
+    }
+  }
+
+  const handleNewSubmit = async (e) => {
     e.preventDefault();
     const ABORT = new AbortController();
     const runCreateFunction = async () => {
       try {
         const response = await createReservation(formData, ABORT.signal);
-        setActiveDate(formData.reservation_date)
+        await setActiveDate(formData.reservation_date)
         console.log("Reservation Created", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -43,6 +69,32 @@ function ReservationForm( { setActiveDate } ) {
       ABORT.abort();
     };
   };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const ABORT = new AbortController();
+    const runUpdateFunction = async () => {
+      try {
+        const response = await updateReservation(formData, ABORT.signal);
+        setActiveDate(formData.reservation_date)
+        console.log("Reservation Updated", response);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log(err);
+        } else {
+          await setApiError(err);
+        }
+      }
+    };
+    await runUpdateFunction();
+    if (!apiError) {
+      history.push('/dashboard');
+    }
+
+    return () => {
+      ABORT.abort();
+    };
+  }
 
   const handleChange = (e) => {
     // DONT FRICKIN DO THIS

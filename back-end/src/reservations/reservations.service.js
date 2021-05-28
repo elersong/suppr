@@ -5,6 +5,7 @@ function update(updatedReservation, reservation_id) {
     .select("*")
     .where({ reservation_id })
     .update(updatedReservation, "*")
+    .then(data => data[0])
 }
 
 function destroy(review_id) {

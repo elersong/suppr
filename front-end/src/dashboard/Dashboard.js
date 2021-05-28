@@ -28,7 +28,7 @@ function Dashboard({ date, setActiveDate }) {
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
       .then(data => {
-        return data.filter(reservation => reservation.status !== "finished")
+        return data.filter(reservation => !["finished", "cancelled"].includes(reservation.status) )
       })
       .then(setReservations)
       .catch(setReservationsError);
@@ -82,6 +82,7 @@ function Dashboard({ date, setActiveDate }) {
                   reservation={reservation}
                   key={idx}
                   setActiveDate={setActiveDate}
+                  triggerRender={forceRerender}
                 />
               );
             })}

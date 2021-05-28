@@ -186,7 +186,6 @@ export async function createReservation(reservationInfo, signal) {
   return await fetchJson(url, options, {});
 }
 
-
 /**
  * Retrieves reservations with matching phone numbers
  * @returns {Promise<[reservation]>}
@@ -199,4 +198,36 @@ export async function createReservation(reservationInfo, signal) {
     url.searchParams.append(key, value.toString())
   );
   return await fetchJson(url, { headers, signal }, []);
+}
+
+/**
+ * Retrieves reservations by id
+ * @returns {Promise<[reservation]>}
+ *  a promise that resolves to a possibly empty array of tables saved in the database.
+ */
+
+ export async function readReservation(params, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${params.reservation_id}`);
+  return await fetchJson(url, { headers, signal }, []);
+}
+
+/**
+ * Updates an existing reservation, sending a PUT request to /reservations/:reservation_id
+ *
+ * @param tableId
+ *  the ID of the table to free-up
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<Error|*>}
+ *  a promise that resolves to the updated reservation
+ */
+ export async function updateReservation(updatedReservation, signal) {
+  const url = `${API_BASE_URL}/reservations/${updatedReservation.reservation_id}`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({"data": updatedReservation}),
+    signal
+  };
+  return await fetchJson(url, options, {});
 }
