@@ -50,7 +50,7 @@ function ReservationForm( { setActiveDate } ) {
     const runCreateFunction = async () => {
       try {
         const response = await createReservation(formData, ABORT.signal);
-        setActiveDate(formData.reservation_date)
+        await setActiveDate(formData.reservation_date)
         console.log("Reservation Created", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -76,7 +76,7 @@ function ReservationForm( { setActiveDate } ) {
     const runUpdateFunction = async () => {
       try {
         const response = await updateReservation(formData, ABORT.signal);
-        setActiveDate(formData.reservation_date)
+        await setActiveDate(formData.reservation_date)
         console.log("Reservation Updated", response);
       } catch (err) {
         if (err.name === "AbortError") {
@@ -88,7 +88,7 @@ function ReservationForm( { setActiveDate } ) {
     };
     await runUpdateFunction();
     if (!apiError) {
-      history.push(`/dashboard`);
+      history.goBack();
     }
 
     return () => {
