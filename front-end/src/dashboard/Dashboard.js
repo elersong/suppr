@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import { listReservations, listTables, resetTable, changeStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationDisplay from "./ReservationDisplay";
 import { today, previous, next } from "../utils/date-time";
@@ -49,6 +49,19 @@ function Dashboard({ date, setActiveDate }) {
   function toDay() {
     setActiveDate(today());
   }
+
+  const handleReset = async (table_id, reservation_id) => {
+    resetTable({table_id, reservation_id})
+    .then(changeStatus("finished", reservation_id))
+    .then(forceRerender);
+  }
+
+  const handleFinish = async (table_id, reservation_id) => {
+    if (
+      window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
+      await handleReset(table_id, reservation_id);
+    }
+  };
 
   return (
     <main className="d-flex flex-column">
@@ -106,7 +119,7 @@ function Dashboard({ date, setActiveDate }) {
                       <th scope="row">{table.table_name}</th>
                       <td>{table.capacity}</td>
                       <td data-table-id-status={table.table_id}>
-                        {table.reservation_id === null ? "Free" : "Occupied"}
+                        {table.reservation_id === null ? "free" : "occupied"}
                       </td>
                       <td>
                         {table.reservation_id && (
@@ -115,12 +128,13 @@ function Dashboard({ date, setActiveDate }) {
                               type="button"
                               className="btn btn-warning"
                               data-table-id-finish={table.table_id}
-                              data-toggle="modal"
-                              data-target="#exampleModalCenter"
+                              onClick={() => handleFinish(table.table_id, table.reservation_id)}
+                              // data-toggle="modal"
+                              // data-target="#exampleModalCenter"
                             >
                               Finish
                             </button>
-                            <ResetTable triggerRender={forceRerender} reservation_id={table.reservation_id} table_id={table.table_id} />
+                            {/* <ResetTable triggerRender={forceRerender} reservation_id={table.reservation_id} table_id={table.table_id} /> */}
                           </div>
                         )}
                       </td>
