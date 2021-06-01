@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { seatTable, listTables, listReservations } from "../utils/api";
+import { seatTable, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
 function SeatingForm({ date }) {
@@ -12,7 +12,6 @@ function SeatingForm({ date }) {
 
   const [formData, setFormData] = useState(startingValues);
   const [tableData, setTableData] = useState([]);
-  const [reservationData, setReservationData] = useState();
 
   const [submitError, setSubmitError] = useState(null);
   const [formError, setFormError] = useState();
@@ -35,15 +34,7 @@ function SeatingForm({ date }) {
         return data;
       })
       .then(setTableData)
-      .then(() => {
-        listReservations({ date }, abortController.signal)
-          .then((data) =>
-            setReservationData(
-              data.filter((res) => +res.reservation_id === +reservation_id)[0]
-            )
-          )
-          .catch(setFormError);
-      });
+      .catch(setFormError);
 
     return () => abortController.abort();
   }
@@ -56,7 +47,6 @@ function SeatingForm({ date }) {
     setSubmitError(null);
     console.log("SEATING FORM JS");
     seatTable(formData)
-      //.then(() => changeStatus("seated", formData.reservation_id, ABORT.signal))
       .then(() => history.push("/dashboard"))
       .catch((error) => console.log("FORM SUBMIT ERROR", error));
     return () => {
@@ -64,47 +54,25 @@ function SeatingForm({ date }) {
     };
   };
 
-  const getCapacity = (id) => {
-    return tableData.find((el) => +el.table_id === +id).capacity;
-  };
-
-  const handleChange = (e) => {
-    // DONT FRICKIN DO THIS
-    // e.preventDefault();
-    let newState;
-
-    // if (reservationData.people <= getCapacity(e.target.value)) {
-    //   newState = { ...formData, table_id: `${e.target.value}` };
-    // } else {
-      newState = { ...formData, table_id: "" };
-    // }
-    console.log("NEW STATE", newState)
-    setFormData(startingValues);
-  };
   return (
-    // <form onSubmit={handleSubmit}>
-    //   <select name="table_id">
-    //     <option value="1">#1 - 6</option>
-    //   </select>
-    //   <button type="submit">submit</button>
-    // </form>
+    <div>
+      {submitError && <ErrorAlert error={submitError} />}
+      {formError && <ErrorAlert error={formError} />}
     <form onSubmit={handleSubmit}>
       <label htmlFor="table_id">Select Table:</label>
         <select
           id="table_id"
           name="table_id"
-          value={formData.table_id}
-          onChange={handleChange}
-        >
+          >
           {tableData.length > 0 &&
             tableData.map((table) => {
               return (
                 <option
-                  key={`table-${table.table_id}`}
-                  value={table.table_id}
+                key={`table-${table.table_id}`}
+                value={table.table_id}
                 >{`${table.table_name} - ${table.capacity}`}</option>
-              );
-            })}
+                );
+              })}
         </select>
         <br></br>
 
@@ -112,131 +80,12 @@ function SeatingForm({ date }) {
         Submit
       </button>
 
-      {/* <button type="button" onClick={history.goBack} className="btn btn-secondary">
+      <button type="button" onClick={history.goBack} className="btn btn-secondary">
           Cancel
-        </button> */}
+        </button>
     </form>
+    </div>
   );
 }
-
-// function SeatingForm({ date }) {
-//   const { reservation_id } = useParams();
-//   const startingValues = {
-//     table_id: "1",
-//     reservation_id,
-//   };
-
-//   const [formData, setFormData] = useState(startingValues);
-//   const [tableData, setTableData] = useState([]);
-//   const [reservationData, setReservationData] = useState();
-
-//   const [submitError, setSubmitError] = useState(null);
-//   const [formError, setFormError] = useState();
-
-//   const history = useHistory();
-
-//   // eslint-disable-next-line
-//   useEffect(loadData, [date, reservation_id]);
-
-//   // Look up data for all tables
-//   // Look up data for all reservations, find the current one
-//   function loadData() {
-//     const abortController = new AbortController();
-
-//     listTables({}, abortController.signal)
-//       .then((data) => data.filter((table) => !table.reservation_id))
-//       .then(data => {
-//         startingValues.table_id = data[0].table_id
-//         setFormData(startingValues)
-//         return data
-//       })
-//       .then(setTableData)
-//       .then(() => {
-//         listReservations({ date }, abortController.signal)
-//         .then((data) =>
-//           setReservationData(
-//             data.filter((res) => +res.reservation_id === +reservation_id)[0]
-//           )
-//         )
-//         .catch(setFormError);
-//       });
-
-//     return () => abortController.abort();
-//   }
-//   console.log("IN SEATINGFORM COMPONENT")
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     console.log("IN THE HANDLESUBMIT")
-//     const ABORT = new AbortController();
-//     setSubmitError(null);
-//     console.log("SEATING FORM JS")
-//     seatTable(formData)
-//       //.then(() => changeStatus("seated", formData.reservation_id, ABORT.signal))
-//       // .then(() => history.push('/dashboard'))
-//       .catch(error => console.log("FORM SUBMIT ERROR",error));
-//     return () => {ABORT.abort()}
-//   };
-
-//   const getCapacity = (id) => {
-//     return tableData.find((el) => +el.table_id === +id).capacity;
-//   };
-
-//   const handleChange = (e) => {
-//     // DONT FRICKIN DO THIS
-//     // e.preventDefault();
-//     let newState;
-
-//     if (reservationData.people <= getCapacity(e.target.value)) {
-//       newState = { ...formData, table_id: `${e.target.value}` };
-//     } else {
-//       newState = { ...formData, table_id: "" };
-//     }
-//     setFormData(newState);
-//   };
-
-//   return (
-//     <div>
-//       {formError && <ErrorAlert error={formError} />}
-//       {submitError && <ErrorAlert error={submitError} />}
-//       <h1>Seat the reservation</h1>
-//       {reservationData &&
-//         <div className="card">
-//         <div className="card-body">
-//           <h5>{`${reservation_id}. ${reservationData.first_name} ${reservationData.last_name}`}</h5>
-//           <h6>{`phone: ${reservationData.mobile_number}`}</h6>
-//           <h6>{`date: ${reservationData.reservation_date} @ ${reservationData.reservation_time}`}</h6>
-//           <h6>{`party size: ${reservationData.people}`}</h6>
-//         </div>
-//       </div>}
-//       <form onSubmit={handleSubmit}>
-//         <label htmlFor="table_id">Select Table:</label>
-//         <select
-//           id="table_id"
-//           name="table_id"
-//           value={formData.table_id}
-//           onChange={handleChange}
-//         >
-//           {tableData.length > 0 &&
-//             tableData.map((table) => {
-//               return (
-//                 <option
-//                   key={`table-${table.table_id}`}
-//                   value={table.table_id}
-//                 >{`${table.table_name} - ${table.capacity}`}</option>
-//               );
-//             })}
-//         </select>
-//         <br></br>
-
-//         <button onClick={handleSubmit} type="submit" className="btn btn-secondary" id="pleaseClick">Submit</button>
-
-//         {/* <button type="button" onClick={history.goBack} className="btn btn-secondary">
-//           Cancel
-//         </button> */}
-//       </form>
-//     </div>
-//   );
-// }
 
 export default SeatingForm;
