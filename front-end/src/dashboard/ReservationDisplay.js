@@ -73,9 +73,7 @@ function ReservationDisplay({ reservation, setActiveDate, triggerRender }) {
         <h6>{`phone: ${mobile_number}`}</h6>
         <h6>{`date: ${reservation_date} @ ${reservation_time}`}</h6>
         <h6>{`party size: ${people}`}</h6>
-        <h6
-          data-reservation-id-status={reservation_id}
-        >{`status: ${status}`}</h6>
+        <h6 data-reservation-id-status={reservation_id}>{`status: ${status}`}</h6>
         {status === "booked" && seatingButton()}
         {status !== "finished" && editButton()}
         {cancelButton()}

@@ -176,12 +176,13 @@ export async function createReservation(reservationInfo, signal) {
  * @returns {Promise<Error|*>}
  *  a promise that resolves to a table row, which will have a null `reservation_id` property.
  */
- export async function changeStatus(status, reservation_id) {
+ export async function changeStatus(status, reservation_id, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({"data": {"status": status}})
+    body: JSON.stringify({"data": {"status": status}}),
+    signal
   };
   return await fetchJson(url, options, {});
 }

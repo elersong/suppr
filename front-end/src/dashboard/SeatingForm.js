@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { seatTable, changeStatus, listTables, listReservations } from "../utils/api";
+import { seatTable, listTables, listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
 function SeatingForm({ date }) {
@@ -27,14 +27,6 @@ function SeatingForm({ date }) {
   function loadData() {
     const abortController = new AbortController();
 
-    listReservations({ date }, abortController.signal)
-      .then((data) =>
-        setReservationData(
-          data.filter((res) => +res.reservation_id === +reservation_id)[0]
-        )
-      )
-      .catch(setFormError);
-
     listTables({}, abortController.signal)
       .then((data) => data.filter((table) => !table.reservation_id))
       .then(data => {
@@ -42,23 +34,34 @@ function SeatingForm({ date }) {
         setFormData(startingValues)
         return data
       })
-      .then(setTableData);
+      .then(setTableData)
+      .then(() => {
+        listReservations({ date }, abortController.signal)
+        .then((data) =>
+          setReservationData(
+            data.filter((res) => +res.reservation_id === +reservation_id)[0]
+          )
+        )
+        .catch(setFormError);
+      });
 
     return () => abortController.abort();
   }
 
   const handleSubmit = (e) => {
+    const ABORT = new AbortController();
     e.preventDefault();
-    e.stopPropagation();
+    //e.stopPropagation();
     setSubmitError(null);
     seatTable(formData)
-      .then(changeStatus("seated", formData.reservation_id))
+      //.then(() => changeStatus("seated", formData.reservation_id, ABORT.signal))
       .then(() => history.push('/dashboard'))
       .catch(setSubmitError);
+    return () => {ABORT.abort()}
   };
 
   const getCapacity = (id) => {
-    return tableData.find((el) => el.table_id === +id).capacity;
+    return tableData.find((el) => +el.table_id === +id).capacity;
   };
 
   const handleChange = (e) => {
@@ -67,7 +70,7 @@ function SeatingForm({ date }) {
     let newState;
 
     if (reservationData.people <= getCapacity(e.target.value)) {
-      newState = { ...formData, table_id: e.target.value };
+      newState = { ...formData, table_id: `${e.target.value}` };
     } else {
       newState = { ...formData, table_id: "" };
     }
@@ -78,6 +81,7 @@ function SeatingForm({ date }) {
     <div>
       {formError && <ErrorAlert error={formError} />}
       {submitError && <ErrorAlert error={submitError} />}
+      <h1>Seat the reservation</h1>
       {reservationData &&
         <div className="card">
         <div className="card-body">
@@ -108,7 +112,7 @@ function SeatingForm({ date }) {
         </select>
         <br></br>
 
-        <button type="submit">Submit</button>
+        <button type="submit" className="btn btn-secondary">Submit</button>
 
         <button type="button" onClick={history.goBack} className="btn btn-secondary">
           Cancel

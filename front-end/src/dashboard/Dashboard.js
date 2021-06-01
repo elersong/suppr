@@ -4,7 +4,6 @@ import ErrorAlert from "../layout/ErrorAlert";
 import ReservationDisplay from "./ReservationDisplay";
 import { today, previous, next } from "../utils/date-time";
 import "./Dashboard.css";
-import ResetTable from "./ResetTable";
 
 /**
  * Defines the dashboard page.
