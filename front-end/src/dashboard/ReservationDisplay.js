@@ -1,11 +1,13 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import {changeStatus} from "../utils/api"
+import { Link } from "react-router-dom";
+import React from "react";
 
 /**
  * Displays the details of one reservation
- * @param reservation
- *  an object, containing names, date, time and size of the reservation
+ * @param {Object} reservation - An object, containing names, date, time and size of the reservation
+ * @param {Function} setActiveDate - Change the date within the Parentmost state component
+ * @param {Function} triggerRender - Flip the boolean state of parent component to trigger re-render
+ *
  * @returns {JSX.Element}
  */
 
@@ -43,26 +45,21 @@ function ReservationDisplay({ reservation, setActiveDate, triggerRender }) {
   };
 
   const handleCancel = async () => {
-    if (
-      window.confirm("Do you want to cancel this reservation? This cannot be undone.")) {
+    if ( window.confirm("Do you want to cancel this reservation? This cannot be undone.") ) {
       await changeStatus("cancelled", reservation_id).then(triggerRender);
     }
   };
 
   const cancelButton = () => {
     return (
-      <span>
-        <button
-          type="button"
-          // data-toggle="modal"
-          // data-target="#reservationCancelModal"
-          data-reservation-id-cancel={reservation.reservation_id}
-          className="btn btn-danger"
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
-      </span>
+      <button
+        type="button"
+        data-reservation-id-cancel={reservation.reservation_id}
+        className="btn btn-danger"
+        onClick={handleCancel}
+      >
+        Cancel
+      </button>
     );
   };
 
