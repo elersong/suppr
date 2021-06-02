@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import ReservationDisplay from "./ReservationDisplay";
 import { searchReservation } from "../utils/api";
 
+/**
+ * Displays the page to search a reservation by phone number
+ * @param {Function} setActiveDate - Change the date within the Parentmost state component
+ *
+ * @returns {JSX.Element}
+ */
+
 function Search({ setActiveDate }) {
   const startingValues = {
     mobile_number: "",
@@ -11,7 +18,7 @@ function Search({ setActiveDate }) {
   const [reservations, setReservations] = useState([]);
 
   const handleChange = (e) => {
-    // DONT FRICKIN DO THIS
+    // DONT FRICKIN DO THIS IN HANDLE CHANGES
     // e.preventDefault();
     let newState = { mobile_number: e.target.value };
     setFormData(newState);
@@ -19,7 +26,6 @@ function Search({ setActiveDate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    e.stopPropagation();
     const ABORT = new AbortController();
     const runSearchFunction = async () => {
       try {
