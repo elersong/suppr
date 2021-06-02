@@ -20,12 +20,13 @@ headers.append("Content-Type", "application/json");
  *
  * This function is NOT exported because it is not needed outside of this file.
  *
- * @param url
+ * @param {String} url
  *  the url for the requst.
- * @param options
+ * @param {Object} options
  *  any options for fetch
  * @param onCancel
  *  value to return if fetch call is aborted. Default value is undefined.
+ * 
  * @returns {Promise<Error|any>}
  *  a promise that resolves to the `json` data or an error.
  *  If the response is not in the 200 - 399 range the promise is rejected.
@@ -55,10 +56,10 @@ async function fetchJson(url, options, onCancel) {
 
 /**
  * Retrieves all existing reservation.
+ * 
  * @returns {Promise<[reservation]>}
  *  a promise that resolves to a possibly empty array of reservation saved in the database.
  */
-
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
@@ -72,10 +73,11 @@ export async function listReservations(params, signal) {
 /**
  * Creates a new reservation, sending a POST request to /reservations/new
  *
- * @param reservationInfo
+ * @param {Object} reservationInfo
  *  an object, describing the reservation to create, which must have proper properties
  * @param signal
  *  optional AbortController.signal
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to the new reservation, which will have a `reservation_id` property.
  */
@@ -93,10 +95,11 @@ export async function createReservation(reservationInfo, signal) {
 /**
  * Creates a new table, sending a POST request to /tables/new
  *
- * @param tableInfo
+ * @param {Object} tableInfo
  *  an object, describing the table to create, which must have proper properties
  * @param signal
  *  optional AbortController.signal
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to the new table, which will have a `table_id` property.
  */
@@ -113,10 +116,13 @@ export async function createReservation(reservationInfo, signal) {
 
 /**
  * Retrieves all existing tables.
- * @returns {Promise<[reservation]>}
+ * 
+ * @param {Object} params
+ *  An object, containing any applicable parameters to be added to the query string of the url
+ * 
+ * @returns {Promise<[table]>}
  *  a promise that resolves to a possibly empty array of tables saved in the database.
  */
-
  export async function listTables(params, signal) {
   const url = new URL(`${API_BASE_URL}/tables`);
   Object.entries(params).forEach(([key, value]) =>
@@ -129,10 +135,9 @@ export async function createReservation(reservationInfo, signal) {
 /**
  * Seats a reservation at a table, sending a PUT request to /tables/:table_id/seat
  *
- * @param tableInfo
+ * @param {Object} tableInfo
  *  an object, describing the table to create, which must have proper properties
- * @param signal
- *  optional AbortController.signal
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to the new table, which will have a `table_id` property.
  */
@@ -147,12 +152,11 @@ export async function createReservation(reservationInfo, signal) {
 }
 
 /**
- * Resets an occupied table, sending a DELETE request to /tables/:table_id/seat
+ * Sets an 'occupied' table to 'free', sending a DELETE request to /tables/:table_id/seat
  *
- * @param tableId
- *  the ID of the table to free-up
- * @param signal
- *  optional AbortController.signal
+ * @param {Object} tableData
+ *  An object, containing the ids of both the relevant table and reservation
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to a table row, which will have a null `reservation_id` property.
  */
@@ -169,10 +173,13 @@ export async function createReservation(reservationInfo, signal) {
 /**
  * Updates the status of an existing reservation, sending a PUT request to /reservations/:reservation_id/status
  *
- * @param tableId
- *  the ID of the table to free-up
+ * @param {String} status
+ *  the status message to set at the reservation.status property
+ * @param {Number|String} reservation_id
+ *  the ID of the reservation to be updated
  * @param signal
  *  optional AbortController.signal
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to a table row, which will have a null `reservation_id` property.
  */
@@ -189,10 +196,14 @@ export async function createReservation(reservationInfo, signal) {
 
 /**
  * Retrieves reservations with matching phone numbers
+ * @param {Object} params
+ *  An object, containing any applicable parameters to be added to the query string of the url
+ * @param signal
+ *  optional AbortController.signal
+ * 
  * @returns {Promise<[reservation]>}
  *  a promise that resolves to a possibly empty array of tables saved in the database.
  */
-
  export async function searchReservation(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
@@ -203,10 +214,14 @@ export async function createReservation(reservationInfo, signal) {
 
 /**
  * Retrieves reservations by id
+ * @param {Object} params
+ *  An object, containing any applicable parameters to be added to the query string of the url
+ * @param signal
+ *  optional AbortController.signal
+ * 
  * @returns {Promise<[reservation]>}
  *  a promise that resolves to a possibly empty array of tables saved in the database.
  */
-
  export async function readReservation(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${params.reservation_id}`);
   return await fetchJson(url, { headers, signal }, []);
@@ -215,10 +230,12 @@ export async function createReservation(reservationInfo, signal) {
 /**
  * Updates an existing reservation, sending a PUT request to /reservations/:reservation_id
  *
- * @param tableId
- *  the ID of the table to free-up
+ * @param {Object} updatedReservation
+ *  the data to overwrite the current version of the reservation
+ *  MUST contain a 'reservation_id' property
  * @param signal
  *  optional AbortController.signal
+ * 
  * @returns {Promise<Error|*>}
  *  a promise that resolves to the updated reservation
  */
