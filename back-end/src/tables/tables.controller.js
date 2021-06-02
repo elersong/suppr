@@ -102,6 +102,17 @@ const isVacant = (req, res, next) => {
   }
 };
 
+function isNotSeated(req, res, next) {
+  if (res.locals.reservation.status !== "seated") {
+    next();
+  } else {
+    next({
+      status: 400,
+      message: "Cannot seat a reservation that's already seated."
+    });
+  }
+}
+
 // Middleware fxns ==========================================================
 
 // GET /tables
@@ -142,6 +153,9 @@ async function seat(req, res) {
 // DELETE /tables/:table_id/seat
 async function reset(req, res) {
   let newTableData = res.locals.table;
+  let newReservationData = res.locals.reservation;
+  newReservationData.status = "finished";
+  await reservationsService.update(newReservationData, newReservationData.reservation_id);
   newTableData.reservation_id = null;
   res.json({ data: await service.update(newTableData, newTableData.table_id) });
 }
@@ -159,6 +173,7 @@ module.exports = {
     asyncErrorBoundary(tableExists),
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(hasSufficientCapacity),
+    asyncErrorBoundary(isNotSeated),
     asyncErrorBoundary(isVacant),
     asyncErrorBoundary(seat),
   ],
