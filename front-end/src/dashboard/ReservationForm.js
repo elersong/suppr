@@ -3,6 +3,14 @@ import { Link, useHistory, useParams } from "react-router-dom";
 import { createReservation, readReservation, updateReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
+/**
+ * Displays the form to create/update a reservation
+ * @param {Function} setActiveDate - Change the date within the Parentmost state component
+ * @param {Number} reservation_id - Optional | The reservation, from the url, to be updated
+ *
+ * @returns {JSX.Element}
+ */
+
 function ReservationForm( { setActiveDate } ) {
   let startingValues = {
     first_name: "",
@@ -21,7 +29,7 @@ function ReservationForm( { setActiveDate } ) {
 
   useEffect(loadReservation, [reservation_id])
 
-  // check for a reservation_id in the url
+  // Check for a reservation_id in the url
   // if it isn't there, then this is a new reservation, so don't load anything
   function loadReservation() {
     if (reservation_id === undefined) return null;
@@ -36,6 +44,8 @@ function ReservationForm( { setActiveDate } ) {
     return () => abortController.abort();
   }
 
+  // Delegate to different handlers depending on whether this form is being used
+  // as a new reservation form or an update reservation form.
   const handleSubmit = async (e) => {
     if (reservation_id === undefined) {
       await handleNewSubmit(e)
@@ -49,9 +59,8 @@ function ReservationForm( { setActiveDate } ) {
     const ABORT = new AbortController();
     const runCreateFunction = async () => {
       try {
-        const response = await createReservation(formData, ABORT.signal);
-        await setActiveDate(formData.reservation_date)
-        console.log("Reservation Created", response);
+        await createReservation(formData, ABORT.signal);
+        await setActiveDate(formData.reservation_date);
       } catch (err) {
         if (err.name === "AbortError") {
           console.log(err);
@@ -75,9 +84,8 @@ function ReservationForm( { setActiveDate } ) {
     const ABORT = new AbortController();
     const runUpdateFunction = async () => {
       try {
-        const response = await updateReservation(formData, ABORT.signal);
-        setActiveDate(formData.reservation_date)
-        console.log("Reservation Updated", response);
+        await updateReservation(formData, ABORT.signal);
+        setActiveDate(formData.reservation_date);
       } catch (err) {
         if (err.name === "AbortError") {
           console.log(err);
@@ -101,7 +109,6 @@ function ReservationForm( { setActiveDate } ) {
     // e.preventDefault();
     let newState;
 
-
     switch (e.target.name) {
       case "first_name":
         newState = { ...formData, first_name: e.target.value };
@@ -120,12 +127,19 @@ function ReservationForm( { setActiveDate } ) {
         setFormData(newState);
         break;
       case "reservation_date":
+        // Date cannot be a Tuesday
         if (new Date(e.target.value).getDay() === 1) {
           setFormError({message: "Restaurant closed on Tuesdays. Select another day."})
           newState = { ...formData, reservation_date: e.target.value };
         } else {
-          if (Date.parse(e.target.value) < Date.now()) {
-            setFormError({message: 'Past dates make no sense. Try again.'})
+          // Date has to be today or in the future
+          let nowDate = new Date();
+          nowDate.setHours(0,0,0,0);
+          let selectedDate = new Date(Date.parse(e.target.value))
+          selectedDate = new Date(selectedDate.setDate(selectedDate.getDate()+1))
+
+          if (Date.parse(selectedDate) < Date.parse(nowDate)) {
+            setFormError({message: 'Selected date must be today or a future date.'})
             newState = { ...formData, reservation_date: e.target.value };
           } else {
             setFormError(null)
