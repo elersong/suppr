@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
-import { createReservation, readReservation, updateReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import { createReservation, readReservation, updateReservation } from "../utils/api";
+import { Link, useHistory, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
 /**
  * Displays the form to create/update a reservation
