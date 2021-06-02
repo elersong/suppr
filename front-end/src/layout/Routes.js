@@ -1,22 +1,23 @@
-import React , { useState } from "react";
-
-import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
+import React , { useState } from "react";
+import { Redirect, Route, Switch } from "react-router-dom";
 import ReservationForm from "../dashboard/ReservationForm";
-import TableForm from "../dashboard/TableForm";
-import SeatingForm from "../dashboard/SeatingForm";
 import Search from "../dashboard/Search"
+import SeatingForm from "../dashboard/SeatingForm";
+import TableForm from "../dashboard/TableForm";
 import { today } from "../utils/date-time";
 import useQuery from "../utils/useQuery";
 
 /**
  * Defines all the routes for the application.
- *
- * You will need to make changes to this file.
+ * This is the parentmost customized component in the application.
+ * Holds the state of the activeDate (date string), passed to children components.
+ * @params none
  *
  * @returns {JSX.Element}
  */
+
 function Routes() {
   const [activeDate, setActiveDate] = useState(today());
   let query = useQuery();
