@@ -1,7 +1,14 @@
+import ErrorAlert from "../layout/ErrorAlert";
+import { createTable } from "../utils/api";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createTable } from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert";
+
+/**
+ * Displays the form to create a new Table object
+ * @param none
+ *
+ * @returns {JSX.Element}
+ */
 
 function TableForm( ) {
   const startingValues = {
@@ -18,8 +25,7 @@ function TableForm( ) {
     const ABORT = new AbortController();
     const runCreateFunction = async () => {
       try {
-        const response = await createTable(formData, ABORT.signal);
-        console.log("Table Created", response);
+        await createTable(formData, ABORT.signal);
       } catch (err) {
         if (err.name === "AbortError") {
           console.log(err);
@@ -28,6 +34,7 @@ function TableForm( ) {
         }
       }
     };
+
     await runCreateFunction();
     if (!apiError) {
       history.push(`/dashboard`);
@@ -39,10 +46,9 @@ function TableForm( ) {
   };
 
   const handleChange = (e) => {
-    // DONT FRICKIN DO THIS
+    // DONT FRICKIN DO THIS IN HANDLE CHANGES
     // e.preventDefault();
     let newState;
-
 
     switch (e.target.name) {
       case "table_name":
@@ -69,6 +75,7 @@ function TableForm( ) {
   return (
     <div>
       {formError && <ErrorAlert error={formError}/>}
+      {apiError && <ErrorAlert error={apiError}/>}
     <form onSubmit={handleSubmit}>
       <label htmlFor="table_name">Table Name: </label>
       <input
@@ -90,7 +97,7 @@ function TableForm( ) {
       ></input>
       <br></br>
 
-      <button type="submit">Submit</button>
+      <button type="submit" className="btn btn-primary">Submit</button>
       <button type="button" onClick={history.goBack} className="btn btn-secondary">Cancel</button>
     </form>
     </div>
