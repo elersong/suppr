@@ -1,24 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { listReservations, listTables, resetTable, changeStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import {
+  listReservations,
+  listTables,
+  resetTable,
+  changeStatus,
+} from "../utils/api";
+import React, { useEffect, useState } from "react";
 import ReservationDisplay from "./ReservationDisplay";
-import { today, previous, next } from "../utils/date-time";
+import { 
+  today, 
+  previous, 
+  next 
+} from "../utils/date-time";
 import "./Dashboard.css";
 
 /**
  * Defines the dashboard page.
+ * Found at /dashboard.
+ * 
  * @param date
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
+
 function Dashboard({ date, setActiveDate }) {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [rerender, setRerender] = useState(true);
 
-  const forceRerender = () => {setRerender(!rerender)}
+  // Utility function to handle strange state updates.
+  // TODO: find a way to refactor this away.
+  const forceRerender = () => {
+    setRerender(!rerender);
+  };
 
+  // This doesn't need exhaustive dependencies.
   // eslint-disable-next-line
   useEffect(loadDashboard, [date, rerender]);
 
@@ -26,8 +43,9 @@ function Dashboard({ date, setActiveDate }) {
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
-      .then(data => {
-        return data.filter(reservation => !["finished", "cancelled"].includes(reservation.status) )
+      .then((data) => {
+        // We're only interested in reservations that are "booked" or "seated"
+        return data.filter( reservation => !["finished", "cancelled"].includes(reservation.status));
       })
       .then(setReservations)
       .catch(setReservationsError);
@@ -49,15 +67,16 @@ function Dashboard({ date, setActiveDate }) {
     setActiveDate(today());
   }
 
+  // Make the reservation "finished" and the table "free"
   const handleReset = async (table_id, reservation_id) => {
-    resetTable({table_id, reservation_id})
-    .then(changeStatus("finished", reservation_id))
-    .then(forceRerender);
-  }
+    resetTable({ table_id, reservation_id })
+      .then(changeStatus("finished", reservation_id))
+      .then(forceRerender);
+  };
 
+  // Confirm the table to be reset
   const handleFinish = async (table_id, reservation_id) => {
-    if (
-      window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
+    if ( window.confirm("Is this table ready to seat new guests? This cannot be undone.") ) {
       await handleReset(table_id, reservation_id);
     }
   };
@@ -111,8 +130,7 @@ function Dashboard({ date, setActiveDate }) {
               </tr>
             </thead>
             <tbody>
-              {tables.length > 0 &&
-                tables.map((table, idx) => {
+              {tables.length > 0 && tables.map((table, idx) => {
                   return (
                     <tr key={`table-${idx}`}>
                       <th scope="row">{table.table_name}</th>
@@ -122,19 +140,14 @@ function Dashboard({ date, setActiveDate }) {
                       </td>
                       <td>
                         {table.reservation_id && (
-                          <div>
-                            <button
-                              type="button"
-                              className="btn btn-warning"
-                              data-table-id-finish={table.table_id}
-                              onClick={() => handleFinish(table.table_id, table.reservation_id)}
-                              // data-toggle="modal"
-                              // data-target="#exampleModalCenter"
-                            >
-                              Finish
-                            </button>
-                            {/* <ResetTable triggerRender={forceRerender} reservation_id={table.reservation_id} table_id={table.table_id} /> */}
-                          </div>
+                          <button
+                            type="button"
+                            className="btn btn-warning"
+                            data-table-id-finish={table.table_id}
+                            onClick={() => handleFinish(table.table_id,table.reservation_id) }
+                          >
+                            Finish
+                          </button>
                         )}
                       </td>
                     </tr>
