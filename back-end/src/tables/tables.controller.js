@@ -77,7 +77,7 @@ const reservationExists = (req, res, next) => {
   } else {
     next({
       status: 400,
-      message: `Table ID: ${res.locals.table.table_id}, Reservation ID: undefined`
+      message: `table_id: ${res.locals.table.table_id}, reservation_id: undefined`
     })
   }
 };
