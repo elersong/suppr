@@ -49,18 +49,19 @@ const tableExists = (req, res, next) => {
   service
     .read(req.params.table_id)
     .then((table) => {
-      if (table) {
+      if (table.length > 0) {
         res.locals.table = table[0];
         return next();
       }
-      next({ status: 404, message: `Table cannot be found.` });
+      next({ status: 404, message: `Table ${req.params.table_id} cannot be found.` });
     })
     .catch(next);
 };
 
 const reservationExists = (req, res, next) => {
-  const { reservation_id } = req.body.data;
-  service
+  if (req.body.data.reservation_id) {
+    const { reservation_id } = req.body.data;
+    service
     .readReservation(reservation_id)
     .then((reserv) => {
       if (reserv.length > 0) {
@@ -73,6 +74,12 @@ const reservationExists = (req, res, next) => {
       });
     })
     .catch((e) => next({ status: 400, message: e.message }));
+  } else {
+    next({
+      status: 400,
+      message: `Table ID: ${res.locals.table.table_id}, Reservation ID: undefined`
+    })
+  }
 };
 
 const hasSufficientCapacity = (req, res, next) => {
@@ -101,6 +108,17 @@ const isVacant = (req, res, next) => {
     });
   }
 };
+
+function isOccupied(req, res, next) {
+  if (res.locals.table.reservation_id) {
+    return next();
+  } else {
+    return next({
+      status: 400,
+      message: "Table currently not occupied. Select another table.",
+    });
+  }
+}
 
 function isNotSeated(req, res, next) {
   if (res.locals.reservation.status !== "seated") {
@@ -153,9 +171,18 @@ async function seat(req, res) {
 // DELETE /tables/:table_id/seat
 async function reset(req, res) {
   let newTableData = res.locals.table;
-  let newReservationData = res.locals.reservation;
-  newReservationData.status = "finished";
-  await reservationsService.update(newReservationData, newReservationData.reservation_id);
+  const foundReservation = await reservationsService.readReservation(newTableData.reservation_id);
+  let resID = newTableData.reservation_id;
+  let newReservationData = {
+    ...foundReservation.first_name,
+    ...foundReservation.last_name,
+    ...foundReservation.mobile_number,
+    ...foundReservation.reservation_date,
+    ...foundReservation.reservation_time,
+    ...foundReservation.people,
+    "status": "finished"
+  }
+  await reservationsService.update(newReservationData, resID);
   newTableData.reservation_id = null;
   res.json({ data: await service.update(newTableData, newTableData.table_id) });
 }
@@ -179,7 +206,7 @@ module.exports = {
   ],
   reset: [
     asyncErrorBoundary(tableExists),
-    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(isOccupied),
     asyncErrorBoundary(reset),
   ],
 };
