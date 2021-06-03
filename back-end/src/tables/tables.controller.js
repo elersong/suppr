@@ -10,6 +10,16 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 // Validation fxns ==========================================================
 
+/**
+ * Validates that the req.body has a 'data' property
+ * @module tables
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Object} req.body.data - Payload of the incoming request
+ * @return {undefined}
+ */
 const hasData = (req, res, next) => {
   if (req.body.data) {
     next();
@@ -21,11 +31,33 @@ const hasData = (req, res, next) => {
   }
 };
 
+/**
+ * Validates that the req.body.data has the required properties
+ * @module tables
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {String} req.body.data.table_name - Selected name of table obj
+ * @param {String} req.body.data.capacity - Selected capacity of table obj
+ * @return {undefined}
+ */
 const hasAllValidProperties = require("../errors/hasProperties")(
   "table_name",
   "capacity"
 );
 
+/**
+ * Validates that the req.body.data has the proper data types and formats
+ * @module tables
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {String} req.body.data.table_name - Selected name of table obj
+ * @param {Number} req.body.data.capacity - Selected capacity of table obj
+ * @return {undefined}
+ */
 const hasValidTableData = (req, res, next) => {
   const { table_name, capacity } = req.body.data;
   let message, tableNameIsValid, capacityIsValid;
@@ -45,6 +77,16 @@ const hasValidTableData = (req, res, next) => {
   }
 };
 
+/**
+ * Validates that the specified table_id has an object in the db
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Number} req.params.table_id - table_id of the table to be searched
+ * @return {undefined}
+ */
 const tableExists = (req, res, next) => {
   service
     .read(req.params.table_id)
@@ -58,6 +100,17 @@ const tableExists = (req, res, next) => {
     .catch(next);
 };
 
+/**
+ * Validates that the reservation associated with the table exists in the db
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Number} req.body.data.reservation_id - ID of reservation to be checked
+ * @param {Number} res.locals.table.table_id - ID of the associated table obj
+ * @return {undefined}
+ */
 const reservationExists = (req, res, next) => {
   if (req.body.data.reservation_id) {
     const { reservation_id } = req.body.data;
@@ -82,6 +135,17 @@ const reservationExists = (req, res, next) => {
   }
 };
 
+/**
+ * Validates that the table capacity is sufficient to hold reservation size
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Object} res.locals.reservation - contextual reservation object
+ * @param {Object} res.locals.table - contextual table object
+ * @return {undefined}
+ */
 const hasSufficientCapacity = (req, res, next) => {
   let { people } = res.locals.reservation;
   let { capacity } = res.locals.table;
@@ -98,6 +162,16 @@ const hasSufficientCapacity = (req, res, next) => {
   }
 };
 
+/**
+ * Validates that the table is not currently occupied
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Object} res.locals.table - contextual table object
+ * @return {undefined}
+ */
 const isVacant = (req, res, next) => {
   if (!res.locals.table.reservation_id) {
     return next();
@@ -109,6 +183,16 @@ const isVacant = (req, res, next) => {
   }
 };
 
+/**
+ * Validates that the table is currently occupied
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {Object} res.locals.table - contextual table object
+ * @return {undefined}
+ */
 function isOccupied(req, res, next) {
   if (res.locals.table.reservation_id) {
     return next();
@@ -120,6 +204,16 @@ function isOccupied(req, res, next) {
   }
 }
 
+/**
+ * Validates that the reservation is not currently seated
+ * @module table
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @param {String} res.locals.reservation.status - status of contextual reservation
+ * @return {undefined}
+ */
 function isNotSeated(req, res, next) {
   if (res.locals.reservation.status !== "seated") {
     next();
