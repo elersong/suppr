@@ -115,7 +115,7 @@ function Dashboard({ date, setActiveDate }) {
               return (
                 <ReservationDisplay
                   reservation={reservation}
-                  key={idx}
+                  key={reservation.reservation_id}
                   setActiveDate={setActiveDate}
                   triggerRender={forceRerender}
                 />
@@ -136,7 +136,7 @@ function Dashboard({ date, setActiveDate }) {
             <tbody>
               {tables.length > 0 && tables.map((table, idx) => {
                   return (
-                    <tr key={`table-${idx}`}>
+                    <tr key={`table-${table.table_id}`}>
                       <th scope="row">{table.table_name}</th>
                       <td>{table.capacity}</td>
                       <td data-table-id-status={table.table_id}>
