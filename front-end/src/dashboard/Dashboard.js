@@ -81,6 +81,10 @@ function Dashboard({ date, setActiveDate }) {
     }
   };
 
+  const containerStyle = {
+    margin: "10px"
+  }
+
   return (
     <main className="d-flex flex-column">
       <h1>Dashboard</h1>
@@ -98,7 +102,7 @@ function Dashboard({ date, setActiveDate }) {
           Next
         </button>
       </div>
-      <div className="d-flex">
+      <div className="d-flex" style={containerStyle}>
         <div className="col-md-6 col-sm-12" id="dasboardReservations">
           {reservations.length === 0 && (
             <ErrorAlert

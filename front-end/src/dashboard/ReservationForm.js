@@ -159,8 +159,15 @@ function ReservationForm( { setActiveDate } ) {
     }
   };
 
+  const divstyles = {
+    margin: "10px"
+  }
+  const inputstyles = {
+    marginBottom: "10px"
+  }
+
   return (
-    <div>
+    <div style={divstyles}>
       {formError && <ErrorAlert error={formError}/>}
     <form onSubmit={handleSubmit}>
       <label htmlFor="first_name">First Name: </label>
@@ -170,6 +177,7 @@ function ReservationForm( { setActiveDate } ) {
         value={formData.first_name}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
       <label htmlFor="last_name">Last Name: </label>
@@ -179,6 +187,7 @@ function ReservationForm( { setActiveDate } ) {
         value={formData.last_name}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
 
@@ -189,6 +198,7 @@ function ReservationForm( { setActiveDate } ) {
         value={formData.mobile_number}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
 
@@ -200,6 +210,7 @@ function ReservationForm( { setActiveDate } ) {
         value={formData.people}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
 
@@ -207,10 +218,10 @@ function ReservationForm( { setActiveDate } ) {
       <input
         type="date"
         name="reservation_date"
-        //min={today()}
         value={formData.reservation_date}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
 
@@ -221,10 +232,11 @@ function ReservationForm( { setActiveDate } ) {
         value={formData.reservation_time}
         onChange={handleChange}
         required
+        style={inputstyles}
       ></input>
       <br></br>
 
-      <button type="submit">Submit</button>
+      <button type="submit" className="btn btn-primary">Submit</button>
       <Link to={`/dashboard`}>
         <button className="btn btn-secondary">Cancel</button>
       </Link>

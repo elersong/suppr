@@ -55,8 +55,12 @@ function SeatingForm() {
       .catch(setSubmitError);
   };
 
+  const containerStyle = {
+    margin: "10px"
+  }
+
   return (
-    <div>
+    <div style={containerStyle}>
       {submitError && <ErrorAlert error={submitError} />}
       {formError && <ErrorAlert error={formError} />}
       <form onSubmit={handleSubmit}>

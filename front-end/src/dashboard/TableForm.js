@@ -72,8 +72,12 @@ function TableForm( ) {
     }
   };
 
+  const containerStyle = {
+    margin: "10px"
+  }
+
   return (
-    <div>
+    <div style={containerStyle}>
       {formError && <ErrorAlert error={formError}/>}
       {apiError && <ErrorAlert error={apiError}/>}
     <form onSubmit={handleSubmit}>
